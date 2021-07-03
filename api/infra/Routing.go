@@ -7,6 +7,6 @@ import (
 )
 
 func Routing(e *echo.Echo) error {
-	e.POST("/registrantion", controller.CreateUser)
+	e.POST("/registrantion", controller.CreateUser) //user.structのデータを貰って登録する
 	return nil
 }
