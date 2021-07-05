@@ -11,8 +11,8 @@ import (
 
 func main() {
 	infra.DBInit()
-	e := echo.New()
-	e.Use(middleware.CORS())
-	infra.Routing(e)
-	e.Logger.Fatal(e.Start(":8080"))
+	e := echo.New()                  //eにecho.New(echoを使っている)
+	e.Use(middleware.CORS())         //echoはCORSを使う
+	infra.Routing(e)                 //infraのRoutingを実行
+	e.Logger.Fatal(e.Start(":8080")) //ポート解放している
 }
