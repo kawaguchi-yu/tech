@@ -1,11 +1,14 @@
 package infra
 
 import (
+	"encoding/json"
 	"fmt"
 	"hello/server/domain"
+	"io"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -50,19 +53,45 @@ func getEnv() env {
 	return e
 }
 
-func CreateUser(c echo.Context) error {
-	u := new(domain.User)
-	c.Bind(u)
+func CreateUser(c echo.Context) error { //中身をDBに入れてJSONで返す
+	u := new(domain.User) //uにUser構造体を代入
+	c.Bind(u)             //c(引数)をuの中に入れる
 	fmt.Printf("%+v\n\n", u)
-	DBCreateData(*u)
 	return c.JSON(http.StatusOK, "name:"+u.Name+", email:"+u.EMail+", password:"+u.Password)
+	//uの中に何が入っているかをJSON形式で返す
 }
 
-func DBCreateData(u domain.User) error {
-	db := GetDB()
-	user := u
-	db.Create(&user)
-	db.Find(&user, "ID = ?", 1)
-	fmt.Println("userの値は", user)
+func DBCreateUser(c echo.Context, db *gorm.DB) error { //渡された値をDBに入れる
+	u := new(domain.User)
+	c.Bind(u)
+	result := db.Create(&u)
+	if result.Error != nil {
+		return result.Error
+	}
 	return nil
+}
+func GetUserModel(b io.ReadCloser) (domain.User, error) {
+	var jsonData = make(map[string]string) //空っぽのmapを作る
+	var user domain.User
+	//デコードしてio.Reader型に変換する
+	if err := json.NewDecoder(b).Decode(&jsonData); err != nil {
+		return user, echo.ErrBadRequest
+	}
+	if jsonData == nil {
+		return user, echo.ErrInternalServerError
+	}
+
+	name := jsonData["Name"]
+	eMail := jsonData["EMail"]
+	rawPassword := []byte(jsonData["Password"])
+	//bcryptでハッシュ化したパスワードをhashedPasswordに入れる
+	hashedPassword, err := bcrypt.GenerateFromPassword(rawPassword, 4)
+	if err != nil {
+		return user, echo.ErrBadRequest
+	}
+
+	user.Name = name
+	user.EMail = eMail
+	user.Password = string(hashedPassword)
+	return user, nil
 }
