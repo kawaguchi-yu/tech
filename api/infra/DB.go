@@ -53,22 +53,21 @@ func getEnv() env {
 	return e
 }
 
-func CreateUser(c echo.Context) error { //中身をDBに入れてJSONで返す
-	u := new(domain.User) //uにUser構造体を代入
-	c.Bind(u)             //c(引数)をuの中に入れる
-	fmt.Printf("%+v\n\n", u)
-	return c.JSON(http.StatusOK, "name:"+u.Name+", email:"+u.EMail+", password:"+u.Password)
-	//uの中に何が入っているかをJSON形式で返す
-}
-
 func DBCreateUser(c echo.Context, db *gorm.DB) error { //渡された値をDBに入れる
 	u := new(domain.User)
 	c.Bind(u)
+	rawPassword := []byte(u.Password)
+	hashedPassword, err := bcrypt.GenerateFromPassword(rawPassword, 4)
+	if err != nil {
+		return echo.ErrBadRequest
+	}
+	u.Password = string(hashedPassword)
+	fmt.Printf("%+v\n\n", u)
 	result := db.Create(&u)
 	if result.Error != nil {
 		return result.Error
 	}
-	return nil
+	return c.JSON(http.StatusOK, "name:"+u.Name+", email:"+u.EMail+", password:"+u.Password)
 }
 func GetUserModel(b io.ReadCloser) (domain.User, error) {
 	var jsonData = make(map[string]string) //空っぽのmapを作る

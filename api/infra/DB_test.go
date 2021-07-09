@@ -31,8 +31,8 @@ func TestCreate(t *testing.T) {
 	assert.NotNil(t, c.Request().Body)                               //指定されたオブジェクトがnilかどうかを判別する
 
 	db, mock, err := testdata.GetMockDB()
-	mock.ExpectExec(regexp.QuoteMeta(`CREATE`)).WillReturnResult(sqlmock.NewResult(1, 13)) //CREATEというslqが来た時に結果を返す
-	mock.ExpectExec(regexp.QuoteMeta(`INSERT`)).WillReturnResult(sqlmock.NewResult(1, 1))  //(1,13)の意味はわからず
+	mock.ExpectExec(regexp.QuoteMeta(`CREATE`)).WillReturnResult(sqlmock.NewResult(1, 10)) //第一引数は主キーのIDの値
+	mock.ExpectExec(regexp.QuoteMeta(`INSERT`)).WillReturnResult(sqlmock.NewResult(1, 10)) //第二引数は本クエリのよって影響を受けるカラムの数
 
 	if err != nil {
 		t.Log(err)
