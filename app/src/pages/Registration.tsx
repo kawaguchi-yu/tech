@@ -98,7 +98,7 @@ const View = () => {
 
         <FormControl onSubmit={handleSubmit(setData)}
           isInvalid={errors.Password ? true : false}>
-          <FormLabel>Password Passwordは8文字以上かつ小文字大文字数字を含めてください。</FormLabel>
+          <FormLabel>Password</FormLabel>
           <Input
             type="password"
             placeholder="password1"

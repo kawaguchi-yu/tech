@@ -7,28 +7,27 @@ import {
 	Heading,
 } from '@chakra-ui/react';
 import Link from './components/Link';
- const Common = () => {
-
+const Common = () => {
 	return (
 		<>
-			<Flex bg={useColorModeValue('gray.100', 'gray.900')}alignItems={'center'}>
-				<Box h={16} p={2}>
+			<Flex bg={useColorModeValue('gray.100', 'gray.900')} alignItems={'center'}>
 				<Link href="/">
-					<Heading>Techer</Heading>
-					</Link>
-				</Box>
+					<Box h={16} p={2} color="Highlight">
+						<Heading>Techer</Heading>
+					</Box>
+				</Link>
 				<Spacer />
 				<Box mr={4}>
-				<Button mr="4" colorScheme="teal" variant="solid">
 					<Link href="/Registration">
-						ユーザー登録
+						<Button mr="4" colorScheme="teal" variant="solid">
+							ユーザー登録
+						</Button>
 					</Link>
-				</Button>
-				<Button colorScheme="teal">
 					<Link href="/login">
-						ログイン
+						<Button colorScheme="teal">
+							ログイン
+						</Button>
 					</Link>
-				</Button>
 				</Box>
 			</Flex>
 		</>

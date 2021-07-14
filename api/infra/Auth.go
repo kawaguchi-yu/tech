@@ -16,7 +16,7 @@ func WriteCookie(c echo.Context) error {
 	cookie.Expires = time.Now().Add(24 * time.Hour)
 	cookie.Path = "/"
 	c.SetCookie(cookie)
-
+	fmt.Printf("%v", cookie.Value)
 	return c.String(http.StatusOK, "write a cookie: "+name)
 }
 

@@ -3,7 +3,6 @@ import {
     Button,
     Stack
 } from "@chakra-ui/react"
-import Link from 'next/link'
 import React from "react"
 import Common from "./template"
 

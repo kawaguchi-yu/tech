@@ -52,10 +52,9 @@ func getEnv() env {
 	}
 	return e
 }
-
 func DBCreateUser(c echo.Context, db *gorm.DB) error { //渡された値をDBに入れる
 	u := new(domain.User)
-	c.Bind(u)
+	c.Bind(u) //cの中のユーザー情報をuに入れる
 	rawPassword := []byte(u.Password)
 	hashedPassword, err := bcrypt.GenerateFromPassword(rawPassword, 4)
 	if err != nil {
@@ -65,9 +64,36 @@ func DBCreateUser(c echo.Context, db *gorm.DB) error { //渡された値をDBに
 	fmt.Printf("%+v\n\n", u)
 	result := db.Create(&u)
 	if result.Error != nil {
-		return result.Error
+		return c.JSON(http.StatusBadRequest, "メールアドレスが重複しています")
 	}
 	return c.JSON(http.StatusOK, "name:"+u.Name+", email:"+u.EMail+", password:"+u.Password)
+}
+
+func Login(c echo.Context, db *gorm.DB) error {
+	u := new(domain.User)
+	c.Bind(u)
+	//ここにメルアドがdbにあるかをチェックする処理を書く
+	fmt.Printf("%v+フォームのemail\n", u.EMail)
+	fmt.Printf("%v+フォームのパスワード\n", u.Password) //ハッシュ化されてない
+	dbPassword, err := getUser(u.EMail, db)
+	if err != nil { //errの中身がnil以外なら終わる
+		return c.JSON(http.StatusBadRequest, "db接続に失敗しました")
+	}
+	fmt.Printf("%v+データベースのパスワード\n", dbPassword) //ハッシュ化されてる
+	if err := bcrypt.CompareHashAndPassword([]byte(dbPassword.Password), []byte(u.Password)); err == nil {
+		return c.JSON(http.StatusOK, "ログインできました")
+	} else {
+		return c.JSON(http.StatusBadRequest, "パスワードが違います")
+	}
+}
+func getUser(email string, db *gorm.DB) (domain.User, error) {
+	var user domain.User
+	if err := db.First(&user, "e_mail = ?", email).Error; err != nil {
+		fmt.Printf("メールアドレスが存在しませんでした\n")
+		return user, echo.ErrBadRequest
+	}
+	fmt.Printf("ユーザー%vユーザー\n", user)
+	return user, nil
 }
 func GetUserModel(b io.ReadCloser) (domain.User, error) {
 	var jsonData = make(map[string]string) //空っぽのmapを作る
