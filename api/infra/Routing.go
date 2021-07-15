@@ -19,8 +19,8 @@ func Routing(e *echo.Echo) {
 	// 	fmt.Printf("WriteCookie\n")
 	// 	return nil
 	// })
-	e.GET("/get", func(c echo.Context) error {
-		ReadCookie(c)
+	e.GET("/user", func(c echo.Context) error {
+		UserVerify(c, GetDB())
 		fmt.Printf("ReadCookie\n")
 		return nil
 	})

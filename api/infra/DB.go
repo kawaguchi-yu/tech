@@ -73,13 +73,13 @@ func Login(c echo.Context, db *gorm.DB) error { //emailとpasswordでjwt入りco
 	u := new(domain.User)
 	c.Bind(u)
 	//ここにメルアドがdbにあるかをチェックする処理を書く
-	// dbPassword, err := getUser(u.EMail, db)
-	// if err != nil { //errの中身がnil以外なら終わる
-	// 	return c.JSON(http.StatusBadRequest, "メールアドレスが存在しませんでした")
-	// }
-	// if err := bcrypt.CompareHashAndPassword([]byte(dbPassword.Password), []byte(u.Password)); err != nil {
-	// 	return c.JSON(http.StatusBadRequest, "パスワードが違います")
-	// }
+	dbPassword, err := getUser(u.EMail, db)
+	if err != nil { //errの中身がnil以外なら終わる
+		return c.JSON(http.StatusBadRequest, "メールアドレスが存在しませんでした")
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(dbPassword.Password), []byte(u.Password)); err != nil {
+		return c.JSON(http.StatusBadRequest, "パスワードが違います")
+	}
 	JWTToken, err := CreateJWT(u.EMail)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "JWTが生成できませんでした")
@@ -90,10 +90,17 @@ func Login(c echo.Context, db *gorm.DB) error { //emailとpasswordでjwt入りco
 
 }
 
-// func userVerify(c echo.Context,db *gorm.DB) error{
-// 	token,err := VerifyToken(JWTToken)
-// 	return nil//
-// }
+func UserVerify(c echo.Context, db *gorm.DB) error {
+	email, err := ReadCookie(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "クッキー読み取りに失敗しました")
+	}
+	var user domain.User
+	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
+		return c.JSON(http.StatusBadRequest, "メールアドレスが存在しません")
+	}
+	return c.JSON(http.StatusOK, user)
+}
 func getUser(email string, db *gorm.DB) (domain.User, error) {
 	var user domain.User
 	if err := db.First(&user, "e_mail = ?", email).Error; err != nil {

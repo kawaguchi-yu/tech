@@ -2,7 +2,9 @@ package infra
 
 import (
 	"fmt"
+
 	"net/http"
+
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -10,11 +12,12 @@ import (
 )
 
 func CreateJWT(EMail string) (string, error) { //認証が通ればCreateJWTで正規ユーザーであることを保証する
-	token := jwt.New(jwt.GetSigningMethod("HS256")) //headerのセット
-	token.Claims = jwt.MapClaims{
-		"email": EMail,
-		"exp":   time.Now().Add(time.Hour * 1).Unix(), // 有効期限を指定
+
+	claims := jwt.StandardClaims{
+		Issuer:    EMail,
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // 有効期限
 	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte("kirikiri")) //電子署名
 	if err != nil {
 		return tokenString, echo.ErrBadRequest
@@ -22,10 +25,6 @@ func CreateJWT(EMail string) (string, error) { //認証が通ればCreateJWTで�
 	return tokenString, nil
 }
 
-// func VerifyToken(tokenString string) (*jwt.Token, error) {
-//     // jwtの検証
-
-// }
 func CreateCookie(JWTToken string) *http.Cookie {
 	cookie := new(http.Cookie)
 	cookie.Name = "jwt"
@@ -37,12 +36,24 @@ func CreateCookie(JWTToken string) *http.Cookie {
 	return cookie
 }
 
-func ReadCookie(c echo.Context) error {
+type Claims struct {
+	jwt.StandardClaims
+}
+
+func ReadCookie(c echo.Context) (string, error) {
 	cookie, err := c.Cookie("jwt")
 	if err != nil {
-		fmt.Println(err)
-		return err
+		fmt.Printf("クッキーを読み込めませんでした%v\n", cookie)
+		return cookie.Value, err
 	}
-	fmt.Println(cookie.Name)
-	return c.String(http.StatusOK, "read a cookie:\n"+cookie.Value)
+	token, err := jwt.ParseWithClaims(cookie.Value, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("kirikiri"), nil
+	})
+	if err != nil || !token.Valid {
+		fmt.Printf("パルスに失敗しました\n")
+		return cookie.Value, echo.ErrBadRequest
+	}
+	claims := token.Claims.(*Claims)
+	email := claims.Issuer
+	return email, nil
 }
