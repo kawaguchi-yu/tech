@@ -13,14 +13,15 @@ func Routing(e *echo.Echo) {
 	// 	}
 	// 	return c.String(http.StatusOK, "OK! you're logined!")
 	// })
-	e.GET("/cookie/set/:name", func(c echo.Context) error {
-		WriteCookie(c)
-		fmt.Printf("WriteCookie")
-		return nil
-	})
-	e.GET("/cookie/get", func(c echo.Context) error {
+
+	// e.GET("/set/:name", func(c echo.Context) error {
+	// 	CreateCookie(c)
+	// 	fmt.Printf("WriteCookie\n")
+	// 	return nil
+	// })
+	e.GET("/get", func(c echo.Context) error {
 		ReadCookie(c)
-		fmt.Printf("ReadCookie")
+		fmt.Printf("ReadCookie\n")
 		return nil
 	})
 	e.POST("/registrantion", func(c echo.Context) error {

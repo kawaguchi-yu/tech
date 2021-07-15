@@ -42,12 +42,14 @@ const Login = (): JSX.Element => {
 			mode: "cors",
 			method: "POST",
 			headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
+			credentials: 'include',
 			body: JSON.stringify(userData),
 		})
 			.then((res) => res.json())
 			.then((data) => {
-				setPosts(data);
-			});
+				setPosts(data);})
+			.catch((err)=>{console.log(err)})
+			
 	};
 
 	return (
