@@ -19,7 +19,6 @@ const Home = (): JSX.Element => {
           </Link>
         </Stack>
       </chakra.div>
-
     </>
   )
 }
