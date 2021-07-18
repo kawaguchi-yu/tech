@@ -7,8 +7,10 @@ import {
 	Heading,
 } from '@chakra-ui/react';
 import Link from './components/Link';
-const Common = () => {
-	return (
+import React from "react"
+
+const MyPagesTemplate = () => {
+    return (
 		<>
 			<Flex bg={useColorModeValue('gray.100', 'gray.900')} alignItems={'center'}>
 				<Link href="/">
@@ -18,14 +20,14 @@ const Common = () => {
 				</Link>
 				<Spacer />
 				<Box mr={4}>
-					<Link href="/registration">
+					<Link href="/Registration">
 						<Button mr="4" colorScheme="teal" variant="solid">
 							ユーザー登録
 						</Button>
 					</Link>
 					<Link href="/login">
 						<Button colorScheme="teal">
-							ログイン
+							アイコン
 						</Button>
 					</Link>
 				</Box>
@@ -33,4 +35,4 @@ const Common = () => {
 		</>
 	);
 }
-export default Common
+export default MyPagesTemplate 

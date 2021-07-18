@@ -93,11 +93,12 @@ func Login(c echo.Context, db *gorm.DB) error { //emailとpasswordでjwt入りco
 func UserVerify(c echo.Context, db *gorm.DB) error {
 	email, err := ReadCookie(c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "クッキー読み取りに失敗しました")
+		fmt.Printf("クッキー読み取りに失敗しました")
+		return c.JSON(http.StatusBadRequest, nil)
 	}
 	var user domain.User
 	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, "メールアドレスが存在しません")
+		return c.JSON(http.StatusBadRequest, nil)
 	}
 	return c.JSON(http.StatusOK, user)
 }

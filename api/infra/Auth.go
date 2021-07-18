@@ -29,7 +29,7 @@ func CreateCookie(JWTToken string) *http.Cookie {
 	cookie := new(http.Cookie)
 	cookie.Name = "jwt"
 	cookie.Value = JWTToken
-	cookie.Expires = time.Now().Add(1 * time.Hour)
+	cookie.Expires = time.Now().Add(10 * time.Hour)
 	cookie.Path = "/"
 	cookie.HttpOnly = true
 
@@ -44,7 +44,7 @@ func ReadCookie(c echo.Context) (string, error) {
 	cookie, err := c.Cookie("jwt")
 	if err != nil {
 		fmt.Printf("クッキーを読み込めませんでした%v\n", cookie)
-		return cookie.Value, err
+		return "error", echo.ErrBadRequest
 	}
 	token, err := jwt.ParseWithClaims(cookie.Value, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("kirikiri"), nil

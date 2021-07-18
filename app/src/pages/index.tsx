@@ -12,7 +12,7 @@ const Home = (): JSX.Element => {
     <>
       <chakra.div><Common />ユーザー登録して一緒に記事を投稿しましょう！
         <Stack direction="row" align="center">
-          <Link href="/Registration">
+          <Link href="/registration">
             <Button colorScheme="teal" variant="solid">
               ユーザー登録
             </Button>
