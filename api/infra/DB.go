@@ -6,6 +6,9 @@ import (
 	"hello/server/domain"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -102,6 +105,43 @@ func UserVerify(c echo.Context, db *gorm.DB) error {
 	}
 	return c.JSON(http.StatusOK, user)
 }
+
+func SetIcon(c echo.Context, db *gorm.DB) error {
+	icon, err := c.FormFile("file") //cからファイルを取り出し
+	if err != nil {
+		fmt.Printf("ファイルが読み込めません\n")
+		return c.JSON(http.StatusBadRequest, icon)
+	}
+	src, err := icon.Open() //io.Readerに変換
+	if err != nil {
+		fmt.Printf("ファイルをioに変換できませんでした\n")
+		return c.JSON(http.StatusBadRequest, "ファイルをioに変換できませんでした")
+	}
+	defer src.Close()
+	prevDir, _ := filepath.Abs(".") //カレントディレクトリのパスを保存
+	err = os.Chdir("img")           //imgディレクトリに移動する
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "フォルダを移動できませんでした")
+	}
+	iconModel := strings.Split(icon.Filename, ".")
+	iconName := iconModel[0]
+	extension := iconModel[1]
+	dst, err := os.Create(fmt.Sprintf("%s_out.%s", iconName, extension)) //新しいファイルを作り、名前を決める
+	if err != nil {
+		fmt.Printf("ファイルが作れませんでした\n")
+		return c.JSON(http.StatusBadRequest, "ファイルが作れませんでした")
+	}
+	defer dst.Close()
+
+	if _, err = io.Copy(dst, src); err != nil { //ファイルの内容をコピー
+		fmt.Printf("コピーできませんでした\n")
+		return c.JSON(http.StatusBadRequest, "コピーできませんでした")
+	}
+	defer os.Chdir(prevDir) //もとに戻る
+	fmt.Printf("正常に終了しました\n" + dst.Name())
+	return c.File(dst.Name()) //なんとかしたい
+}
+
 func getUser(email string, db *gorm.DB) (domain.User, error) {
 	var user domain.User
 	if err := db.First(&user, "e_mail = ?", email).Error; err != nil {

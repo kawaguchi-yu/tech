@@ -32,4 +32,9 @@ func Routing(e *echo.Echo) {
 		Login(c, GetDB())
 		return nil
 	}) //emailがdbにあればパスワードを検証して、合っていれば
+	e.POST("/seticon", func(c echo.Context) error {
+		SetIcon(c, GetDB())
+		fmt.Printf("SetIcon\n")
+		return nil
+	})
 }

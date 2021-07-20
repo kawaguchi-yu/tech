@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react"
-import Common from "./template";
 import {
 	chakra,
 	Stack,
 	Button,
 	Heading,
 } from '@chakra-ui/react';
+import Link from './components/Link';
+import MyPagesTemplate from "./myPagesTemplate";
 type user = {
 	ID: string
 	CreatedAt: string
@@ -58,27 +59,19 @@ const MyPages = (): JSX.Element => {
 	const [email, setEMail] = useState<user>({ ID: "", CreatedAt: "", UpdatedAt: "", DeletedAt: "", Name: "", EMail: "", Password: "", Posts: "", Profile: "", ProfileID: "", Goods: "", });
 	const [hasCookie, setHasCookie] = useState<boolean>(false);
 
-	if (hasCookie) {
-		return (
-			<>
-				<Common />
-				<chakra.div>
-					<Stack direction="row" align="center">
-						<Heading>welcome!{email.Name}</Heading>
-					</Stack>
-				</chakra.div>
-			</>
-		)
-	} else {
-		return(
+	return (
 		<>
-			<Common />
+			<MyPagesTemplate />
 			<chakra.div>
 				<Stack direction="row" align="center">
-					<Heading>ログインしてないよ！</Heading>
+					{hasCookie
+						? <><Heading>welcome!{email.Name}</Heading>
+							<Heading><Link href="/config">設定する</Link></Heading>
+						</>
+						: <Heading>ログインしてないよ</Heading>}
 				</Stack>
 			</chakra.div>
 		</>
-		)}
+	)
 }
 export default MyPages

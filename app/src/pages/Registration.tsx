@@ -12,7 +12,7 @@ import {
   Checkbox,
   Box,
 } from "@chakra-ui/react"
-import Common from "./template"
+import MyPagesTemplate from "./myPagesTemplate";
 
 type FormData = {
   Name: string;
@@ -55,11 +55,11 @@ const View = () => {
         setPosts(data);
       });
   };
-  
+
   return (
     <>
       <chakra.div>
-        <Common />
+        <MyPagesTemplate />
         ユーザー登録して一緒に記事を投稿しましょう！
         <FormControl onSubmit={handleSubmit(setData)}
           isInvalid={errors.Name ? true : false}>
@@ -117,13 +117,13 @@ const View = () => {
           {errors.Password && errors.Password.message}
           <FormHelperText>Passwordは8文字以上かつ小文字大文字数字を含めてください。We will never share your password.</FormHelperText>
         </FormControl>
-        
+
         <FormControl onSubmit={handleSubmit(setData)}
           isInvalid={errors.isTerms ? true : false}>
           <Checkbox
-            {...register("isTerms",{required: true})}
+            {...register("isTerms", { required: true })}
           ><Link color="teal.500" href="/terms">
-            利用規約</Link>に同意する</Checkbox>
+              利用規約</Link>に同意する</Checkbox>
         </FormControl>
         <Button type="submit"
           colorScheme="teal"

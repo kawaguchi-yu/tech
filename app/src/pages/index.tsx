@@ -5,12 +5,11 @@ import {
 } from "@chakra-ui/react"
 import Link from './components/Link';
 import React from "react"
-import Common from "./template"
-
+import MyPagesTemplate from "./myPagesTemplate";
 const Home = (): JSX.Element => {
   return (
     <>
-      <chakra.div><Common />ユーザー登録して一緒に記事を投稿しましょう！
+      <chakra.div><MyPagesTemplate /> ユーザー登録して一緒に記事を投稿しましょう！
         <Stack direction="row" align="center">
           <Link href="/registration">
             <Button colorScheme="teal" variant="solid">
