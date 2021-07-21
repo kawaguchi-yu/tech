@@ -7,24 +7,17 @@ import (
 )
 
 func Routing(e *echo.Echo) {
-	// e.GET("/Login", func(c echo.Context) error {
-	// 	if err := CheckToken(c); err != nil {
-	// 		return err
-	// 	}
-	// 	return c.String(http.StatusOK, "OK! you're logined!")
-	// })
-
-	// e.GET("/set/:name", func(c echo.Context) error {
-	// 	CreateCookie(c)
-	// 	fmt.Printf("WriteCookie\n")
-	// 	return nil
-	// })
-	e.GET("/user", func(c echo.Context) error {
-		UserVerify(c, GetDB())
-		fmt.Printf("ReadCookie\n")
+	e.GET("/icon", func(c echo.Context) error {
+		ReadCookieReturnIcon(c, GetDB())
+		fmt.Printf("ReadCookie.return.icon\n")
 		return nil
 	})
-	e.POST("/registrantion", func(c echo.Context) error {
+	e.GET("/user", func(c echo.Context) error {
+		ReadCookieReturnUser(c, GetDB())
+		fmt.Printf("ReadCookie.return.user\n")
+		return nil
+	})
+	e.POST("/signup", func(c echo.Context) error {
 		DBCreateUser(c, GetDB())
 		return nil
 	}) //user.structのデータを貰って登録する

@@ -1,6 +1,5 @@
 import React, { useState } from "react"
 import {
-	Box,
 	Flex,
 	Button,
 	Input,
@@ -16,7 +15,7 @@ const Config = () => {
 		const image = new FormData()
 		image.append("file", e.target.files[0])
 		setIconData(image)
-		console.log(e.target.files[0])
+		console.log("ターゲットファイルの中身",e.target.files[0])
 	};
 	const ApiFetch = () => {
 		const options: RequestInit = {
@@ -31,12 +30,10 @@ const Config = () => {
 			.then((res) => res.blob())
 			.then((data) => {
 				setPosts(data);
-				console.log("返ってきたデータ")
-				console.log(data)
-				console.log(view)
+				console.log("返ってきたデータ",data)
 			})
-			// .catch((err) => { console.log(err) })
-		console.log("アイコンデータ",iconData)
+		// .catch((err) => { console.log(err) })
+		console.log("アイコンデータ", iconData)
 	};
 	return (<>
 		<MyPagesTemplate />

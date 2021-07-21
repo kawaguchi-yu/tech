@@ -13,5 +13,5 @@ type User struct {
 	Profile   Profile
 	ProfileID uint
 	Goods     []Good
-	icon      string
+	Icon      string
 }

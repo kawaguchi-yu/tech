@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import Link from './components/Link';
 import React, { useState, useEffect } from "react"
-type user = {
+type dataStruct = {
 	ID: string
 	CreatedAt: string
 	UpdatedAt: string
@@ -26,7 +26,7 @@ type user = {
 	ProfileID: string
 	Goods: string
 };
-var userData: user = {
+var returnData: dataStruct = {
 	ID: "",
 	CreatedAt: "",
 	UpdatedAt: "",
@@ -39,30 +39,44 @@ var userData: user = {
 	ProfileID: "",
 	Goods: "",
 }
-
 const MyPagesTemplate = () => {
+
 	useEffect(() => {
+		const options: RequestInit = {
+			mode: "cors",
+			method: "GET",
+			credentials: 'include',
+		}
 		fetch("http://localhost:8080/user", {
 			mode: "cors",
 			method: "GET",
 			headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
 			credentials: 'include',
-		})
-			.then((res) => res.json())
+		}).then((res) => res.json())
 			.then((data) => {
 				const result = JSON.stringify(data)
-				const result2: user = JSON.parse(result)
-				userData = result2
-				setEMail(userData)
-				if (userData == null) {
-					console.log("データはないよ！", userData)
+				const result2: dataStruct = JSON.parse(result)
+				returnData = result2
+				setUser(returnData)
+				if (returnData == null) {
+					console.log("データはないよ！", returnData)
 				} else {
 					setHasCookie(true)
-					console.log("データはあるよ！", userData)
+					console.log("データはあるよ！", returnData)
 				}
 			})
+		fetch("http://localhost:8080/icon", {
+			mode: "cors",
+			method: "GET",
+			credentials: 'include',
+		}).then((res) => res.blob())
+			.then((data) => {
+				setIcon(data);
+				console.log("データ", data)
+			})
 	}, [])
-	const [email, setEMail] = useState<user>({ ID: "", CreatedAt: "", UpdatedAt: "", DeletedAt: "", Name: "", EMail: "", Password: "", Posts: "", Profile: "", ProfileID: "", Goods: "", });
+	const [user, setUser] = useState<dataStruct>(returnData);
+	const [icon, setIcon] = useState<Blob>()
 	const [hasCookie, setHasCookie] = useState<boolean>(false);
 	return (
 		<>
@@ -76,15 +90,14 @@ const MyPagesTemplate = () => {
 				<Box mr={4}>
 					<Flex direction="row" align="center">
 						{hasCookie
-							? <><Heading mr="4">welcome!{email.Name}</Heading>
+							? <><Heading mr="4">welcome!{user.Name}</Heading>
 								<Spacer />
 								<Menu>
 									<MenuButton as={Button} h={16} p={2}>
-										<Image
-											boxSize="50px"
+										{icon && <Image boxSize="50px"
 											borderRadius="full"
-											src="https://bit.ly/sage-adebayo"
-											alt="Segun Adebayo" />
+											src={(window.URL.createObjectURL(icon))}
+											alt="select picture" />}
 									</MenuButton>
 									<MenuList>
 										<Link href="/config"><MenuItem>設定</MenuItem></Link>
@@ -94,14 +107,14 @@ const MyPagesTemplate = () => {
 								</Menu>
 							</>
 							: <>
-								<Link href="/registration">
+								<Link href="/signup">
 									<Button mr="4" colorScheme="teal" variant="solid">
 										ユーザー登録
 									</Button>
 								</Link>
 								<Link href="/login">
 									<Button colorScheme="teal">
-										アイコン
+										ログイン
 									</Button>
 								</Link>
 							</>

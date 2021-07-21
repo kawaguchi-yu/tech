@@ -93,7 +93,7 @@ func Login(c echo.Context, db *gorm.DB) error { //emailとpasswordでjwt入りco
 
 }
 
-func UserVerify(c echo.Context, db *gorm.DB) error {
+func ReadCookieReturnUser(c echo.Context, db *gorm.DB) error {
 	email, err := ReadCookie(c)
 	if err != nil {
 		fmt.Printf("クッキー読み取りに失敗しました")
@@ -105,7 +105,30 @@ func UserVerify(c echo.Context, db *gorm.DB) error {
 	}
 	return c.JSON(http.StatusOK, user)
 }
-
+func ReadCookieReturnIcon(c echo.Context, db *gorm.DB) error {
+	email, err := ReadCookie(c)
+	if err != nil {
+		fmt.Printf("クッキー読み取りに失敗しました")
+		return c.JSON(http.StatusBadRequest, nil)
+	}
+	var user domain.User
+	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
+		return c.JSON(http.StatusBadRequest, nil)
+	}
+	prevDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "フォルダパスを取得できませんでした")
+	}
+	defer os.Chdir(prevDir) //もとに戻る
+	err = os.Chdir("img")   //imgディレクトリに移動する
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "フォルダを移動できませんでした")
+	}
+	if user.Icon == "" {
+		return c.File("firsticon.jpg")
+	}
+	return c.File(user.Icon)
+}
 func SetIcon(c echo.Context, db *gorm.DB) error {
 	icon, err := c.FormFile("file") //cからファイルを取り出し
 	if err != nil {
@@ -118,8 +141,12 @@ func SetIcon(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusBadRequest, "ファイルをioに変換できませんでした")
 	}
 	defer src.Close()
-	prevDir, _ := filepath.Abs(".") //カレントディレクトリのパスを保存
-	err = os.Chdir("img")           //imgディレクトリに移動する
+	prevDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "フォルダパスを取得できませんでした")
+	}
+	defer os.Chdir(prevDir) //もとに戻る
+	err = os.Chdir("img")   //imgディレクトリに移動する
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "フォルダを移動できませんでした")
 	}
@@ -137,9 +164,22 @@ func SetIcon(c echo.Context, db *gorm.DB) error {
 		fmt.Printf("コピーできませんでした\n")
 		return c.JSON(http.StatusBadRequest, "コピーできませんでした")
 	}
-	defer os.Chdir(prevDir) //もとに戻る
+
+	//ここまでが画像をローカルフォルダに保存する行程、ここからがuserのiconに画像データを入れる
+	email, err := ReadCookie(c)
+	if err != nil {
+		fmt.Printf("クッキー読み取りに失敗しました")
+		return c.JSON(http.StatusBadRequest, nil)
+	}
+	var user domain.User
+	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
+		return c.JSON(http.StatusBadRequest, nil)
+	}
+	db.Model(&user).Update("icon", dst.Name())
+	fmt.Printf("ユーザーネーム=%v\n", user.Name)
 	fmt.Printf("正常に終了しました\n" + dst.Name())
-	return c.File(dst.Name()) //なんとかしたい
+	return c.File("iroha_out.jpg")
+	//例c.File(test.jpg)→test.jpgのファイルが送られる。
 }
 
 func getUser(email string, db *gorm.DB) (domain.User, error) {
@@ -148,7 +188,7 @@ func getUser(email string, db *gorm.DB) (domain.User, error) {
 		fmt.Printf("メールアドレスが存在しませんでした\n")
 		return user, echo.ErrBadRequest
 	}
-	fmt.Printf("ユーザー%vユーザー\n", user)
+	fmt.Printf("user=%v\n", user)
 	return user, nil
 }
 func GetUserModel(b io.ReadCloser) (domain.User, error) {

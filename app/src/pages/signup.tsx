@@ -44,7 +44,7 @@ const View = () => {
   };
   const ApiFetch = () => {
     setData()
-    fetch("http://localhost:8080/registrantion", {
+    fetch("http://localhost:8080/signup", {
       mode: "cors",
       method: "POST",
       headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
