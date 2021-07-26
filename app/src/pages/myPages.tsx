@@ -6,7 +6,7 @@ import {
 	Heading,
 } from '@chakra-ui/react';
 import Link from './components/Link';
-import MyPagesTemplate from "./myPagesTemplate";
+import Template from "./template";
 type user = {
 	ID: string
 	CreatedAt: string
@@ -61,7 +61,7 @@ const MyPages = (): JSX.Element => {
 
 	return (
 		<>
-			<MyPagesTemplate />
+			<Template />
 			<chakra.div>
 				<Stack direction="row" align="center">
 					{hasCookie

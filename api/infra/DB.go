@@ -127,6 +127,7 @@ func ReadCookieReturnIcon(c echo.Context, db *gorm.DB) error {
 	if user.Icon == "" {
 		return c.File("firsticon.jpg")
 	}
+	fmt.Printf("iconは正常に読み取れました\n")
 	return c.File(user.Icon)
 }
 func SetIcon(c echo.Context, db *gorm.DB) error {
@@ -178,7 +179,7 @@ func SetIcon(c echo.Context, db *gorm.DB) error {
 	db.Model(&user).Update("icon", dst.Name())
 	fmt.Printf("ユーザーネーム=%v\n", user.Name)
 	fmt.Printf("正常に終了しました\n" + dst.Name())
-	return c.File("iroha_out.jpg")
+	return c.File(user.Icon)
 	//例c.File(test.jpg)→test.jpgのファイルが送られる。
 }
 

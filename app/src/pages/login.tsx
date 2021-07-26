@@ -6,18 +6,15 @@ import {
 	Flex,
 	Box,
 	FormControl,
-	FormLabel,
 	Input,
-	Checkbox,
 	Stack,
 	Button,
 	Heading,
 	useColorModeValue,
-	FormHelperText,
 } from '@chakra-ui/react';
 type LoginData = {
-	EMail: string;
-	Password: string;
+	EMail: string
+	Password: string
 }
 const userData: LoginData = {
 	EMail: "",
@@ -50,7 +47,6 @@ const Login = (): JSX.Element => {
 				setPosts(data);
 			})
 			.catch((err) => { console.log(err) })
-
 	};
 
 	return (

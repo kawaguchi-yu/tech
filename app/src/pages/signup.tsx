@@ -12,7 +12,7 @@ import {
   Checkbox,
   Box,
 } from "@chakra-ui/react"
-import MyPagesTemplate from "./myPagesTemplate";
+import Template from "./template";
 
 type FormData = {
   Name: string;
@@ -59,8 +59,8 @@ const View = () => {
   return (
     <>
       <chakra.div>
-        <MyPagesTemplate />
-        ユーザー登録して一緒に記事を投稿しましょう！
+        <Template />
+        アカウントを作っていろんな機能を使って見ましょう！
         <FormControl onSubmit={handleSubmit(setData)}
           isInvalid={errors.Name ? true : false}>
           <FormLabel>名前</FormLabel>

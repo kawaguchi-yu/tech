@@ -5,7 +5,7 @@ import {
 	Input,
 	Image,
 } from '@chakra-ui/react';
-import MyPagesTemplate from "./myPagesTemplate";
+import Template from "./template";
 const Config = () => {
 	const [view, setview] = useState<string>();
 	const [posts, setPosts] = useState<Blob>();
@@ -36,7 +36,7 @@ const Config = () => {
 		console.log("アイコンデータ", iconData)
 	};
 	return (<>
-		<MyPagesTemplate />
+		<Template />
 		<Flex>
 			{view &&
 				<Image boxSize="300px" src={view} alt="select picture" />

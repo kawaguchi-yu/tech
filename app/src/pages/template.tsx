@@ -39,7 +39,7 @@ var returnData: dataStruct = {
 	ProfileID: "",
 	Goods: "",
 }
-const MyPagesTemplate = () => {
+const Template = () => {
 
 	useEffect(() => {
 		const options: RequestInit = {
@@ -125,4 +125,4 @@ const MyPagesTemplate = () => {
 		</>
 	);
 }
-export default MyPagesTemplate
+export default Template
