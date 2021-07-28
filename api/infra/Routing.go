@@ -17,6 +17,16 @@ func Routing(e *echo.Echo) {
 		fmt.Printf("ReadCookie.return.user\n")
 		return nil
 	})
+	e.POST("/getuserpost", func(c echo.Context) error {
+		ReadCookieReturnUserPost(c, GetDB())
+		fmt.Printf("ReadCookie.return.userpost\n")
+		return nil
+	})
+	e.POST("/post", func(c echo.Context) error {
+		CreatePostQuiz(c, GetDB())
+		fmt.Printf("post処理が呼ばれました\n")
+		return nil
+	})
 	e.POST("/signup", func(c echo.Context) error {
 		DBCreateUser(c, GetDB())
 		return nil

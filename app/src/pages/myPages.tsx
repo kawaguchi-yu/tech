@@ -4,71 +4,62 @@ import {
 	Stack,
 	Button,
 	Heading,
+	Box,
+	VStack,
 } from '@chakra-ui/react';
 import Link from './components/Link';
 import Template from "./template";
 type user = {
-	ID: string
+	ID: number
 	CreatedAt: string
 	UpdatedAt: string
 	DeletedAt: string
-	Name: string
-	EMail: string
-	Password: string
-	Posts: string
-	Profile: string
-	ProfileID: string
-	Goods: string
+	UserID: number
+	Title: string
+	WrongAnswer1: string
+	WrongAnswer2: string
+	WrongAnswer3: string
+	Explanation: string
+	Tags: any
+	Goods: any
 };
-var userData: user = {
-	ID: "",
-	CreatedAt: "",
-	UpdatedAt: "",
-	DeletedAt: "",
-	Name: "",
-	EMail: "",
-	Password: "",
-	Posts: "",
-	Profile: "",
-	ProfileID: "",
-	Goods: "",
-}
 
 const MyPages = (): JSX.Element => {
 	useEffect(() => {
-		fetch("http://localhost:8080/user", {
+		fetch("http://localhost:8080/getuserpost", {
 			mode: "cors",
-			method: "GET",
+			method: "POST",
 			headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
 			credentials: 'include',
 		})
 			.then((res) => res.json())
 			.then((data) => {
-				const result = JSON.stringify(data)
-				const result2: user = JSON.parse(result)
-				userData = result2
-				setEMail(userData)
-				if (userData == null) {
-					console.log("データはないよ！", userData)
-				} else {
-					setHasCookie(true)
-					console.log("データはあるよ！", userData)
-				}
+				data.forEach(array =>
+					setPostDatas(postDatas => [...postDatas, array]),
+					console.log(data)
+				)
 			})
 	}, [])
-	const [email, setEMail] = useState<user>({ ID: "", CreatedAt: "", UpdatedAt: "", DeletedAt: "", Name: "", EMail: "", Password: "", Posts: "", Profile: "", ProfileID: "", Goods: "", });
-	const [hasCookie, setHasCookie] = useState<boolean>(false);
-
+	const [postDatas, setPostDatas] = useState<user[]>([])
+	const PostsView = () => {
+		if(postDatas[0]){
+		var dayData = postDatas[0].CreatedAt
+		var dayData2 = dayData.substring(0,10)
+		}
+		return (<>
+			<VStack>
+				{postDatas[0] && <><Box>{dayData2}</Box>
+					<Box><Link href="">{postDatas[0].Title}</Link></Box>
+				</>}
+			</VStack>
+		</>)
+	}
 	return (
 		<>
 			<Template />
 			<chakra.div>
 				<Stack direction="row" align="center">
-					{hasCookie
-						? <><Heading>welcome!{email.Name}</Heading>
-							<Heading><Link href="/config">設定する</Link></Heading>
-						</>
-						: <Heading>ログインしてないよ</Heading>}
+					<PostsView />
 				</Stack>
 			</chakra.div>
 		</>

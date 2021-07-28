@@ -96,7 +96,7 @@ func Login(c echo.Context, db *gorm.DB) error { //emailとpasswordでjwt入りco
 func ReadCookieReturnUser(c echo.Context, db *gorm.DB) error {
 	email, err := ReadCookie(c)
 	if err != nil {
-		fmt.Printf("クッキー読み取りに失敗しました")
+		fmt.Printf("クッキー読み取りに失敗しました\n")
 		return c.JSON(http.StatusBadRequest, nil)
 	}
 	var user domain.User
@@ -108,7 +108,7 @@ func ReadCookieReturnUser(c echo.Context, db *gorm.DB) error {
 func ReadCookieReturnIcon(c echo.Context, db *gorm.DB) error {
 	email, err := ReadCookie(c)
 	if err != nil {
-		fmt.Printf("クッキー読み取りに失敗しました")
+		fmt.Printf("クッキー読み取りに失敗しました\n")
 		return c.JSON(http.StatusBadRequest, nil)
 	}
 	var user domain.User
@@ -127,9 +127,27 @@ func ReadCookieReturnIcon(c echo.Context, db *gorm.DB) error {
 	if user.Icon == "" {
 		return c.File("firsticon.jpg")
 	}
-	fmt.Printf("iconは正常に読み取れました\n")
 	return c.File(user.Icon)
 }
+
+func ReadCookieReturnUserPost(c echo.Context, db *gorm.DB) error {
+	email, err := ReadCookie(c)
+	if err != nil {
+		fmt.Printf("クッキー読み取りに失敗しました\n")
+		return c.JSON(http.StatusBadRequest, nil)
+	}
+	var user domain.User
+	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
+		fmt.Printf("ユーザー取得に失敗しました\n")
+		return c.JSON(http.StatusBadRequest, nil)
+	}
+	var post []domain.Post
+	db.Where("user_id = ?", user.ID).Find(&post)
+	fmt.Printf("userIDは%v\n", user.ID)
+	fmt.Printf("処理は正常に終了しました%v\n", post)
+	return c.JSON(http.StatusOK, post)
+}
+
 func SetIcon(c echo.Context, db *gorm.DB) error {
 	icon, err := c.FormFile("file") //cからファイルを取り出し
 	if err != nil {
@@ -154,7 +172,7 @@ func SetIcon(c echo.Context, db *gorm.DB) error {
 	iconModel := strings.Split(icon.Filename, ".")
 	iconName := iconModel[0]
 	extension := iconModel[1]
-	dst, err := os.Create(fmt.Sprintf("%s_out.%s", iconName, extension)) //新しいファイルを作り、名前を決める
+	dst, err := os.Create(fmt.Sprintf("%s_out.%s\n", iconName, extension)) //新しいファイルを作り、名前を決める
 	if err != nil {
 		fmt.Printf("ファイルが作れませんでした\n")
 		return c.JSON(http.StatusBadRequest, "ファイルが作れませんでした")
@@ -169,10 +187,10 @@ func SetIcon(c echo.Context, db *gorm.DB) error {
 	//ここまでが画像をローカルフォルダに保存する行程、ここからがuserのiconに画像データを入れる
 	email, err := ReadCookie(c)
 	if err != nil {
-		fmt.Printf("クッキー読み取りに失敗しました")
+		fmt.Printf("クッキー読み取りに失敗しました\n")
 		return c.JSON(http.StatusBadRequest, nil)
 	}
-	var user domain.User
+	user := new(domain.User)
 	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
 		return c.JSON(http.StatusBadRequest, nil)
 	}
@@ -183,6 +201,23 @@ func SetIcon(c echo.Context, db *gorm.DB) error {
 	//例c.File(test.jpg)→test.jpgのファイルが送られる。
 }
 
+func CreatePostQuiz(c echo.Context, db *gorm.DB) error {
+	post := new(domain.Post)
+	c.Bind(post)
+	email, err := ReadCookie(c)
+	if err != nil {
+		fmt.Printf("クッキー読み取りに失敗しました\n")
+		return c.JSON(http.StatusBadRequest, nil)
+	}
+	user := new(domain.User)
+	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
+		return c.JSON(http.StatusBadRequest, nil)
+	}
+	post.UserID = user.ID
+	db.Create(&post)
+	fmt.Printf("処理は正常に終了しました\n")
+	return c.JSON(http.StatusOK, post)
+}
 func getUser(email string, db *gorm.DB) (domain.User, error) {
 	var user domain.User
 	if err := db.First(&user, "e_mail = ?", email).Error; err != nil {

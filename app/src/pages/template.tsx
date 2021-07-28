@@ -100,6 +100,8 @@ const Template = () => {
 											alt="select picture" />}
 									</MenuButton>
 									<MenuList>
+									<Link href="/myPages"><MenuItem>マイページ</MenuItem></Link>
+										<Link href="post"><MenuItem>クイズを投稿する</MenuItem></Link>
 										<Link href="/config"><MenuItem>設定</MenuItem></Link>
 										<Link href="/terms"><MenuItem>利用規約</MenuItem></Link>
 										<MenuItem>ログアウト</MenuItem>
