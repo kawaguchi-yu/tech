@@ -12,6 +12,7 @@ import {
 	Heading,
 	useColorModeValue,
 } from '@chakra-ui/react';
+import router from "next/router";
 type LoginData = {
 	EMail: string
 	Password: string
@@ -44,9 +45,17 @@ const Login = (): JSX.Element => {
 		})
 			.then((res) => res.json())
 			.then((data) => {
-				setPosts(data);
+				if(data=="メールアドレスが存在しませんでした"){
+				setPosts(data)
+					console.log(data)
+			}else if(data=="パスワードが違います"){
+				setPosts(data)
+				console.log(data)
+			}else{
+				setPosts(data)
+				router.back()
+			}
 			})
-			.catch((err) => { console.log(err) })
 	};
 
 	return (

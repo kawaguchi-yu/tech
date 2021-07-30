@@ -31,10 +31,15 @@ func Routing(e *echo.Echo) {
 		DBCreateUser(c, GetDB())
 		return nil
 	}) //user.structのデータを貰って登録する
-	e.POST("/login", func(c echo.Context) error {
+	e.POST("/login", func(c echo.Context) error { //ログイン
 		Login(c, GetDB())
 		return nil
-	}) //emailがdbにあればパスワードを検証して、合っていれば
+	})
+	e.GET("/logout", func(c echo.Context) error { //cookie
+		Logout(c, GetDB())
+		fmt.Printf("logout処理が呼ばれました\n")
+		return nil
+	})
 	e.POST("/seticon", func(c echo.Context) error {
 		SetIcon(c, GetDB())
 		fmt.Printf("SetIcon\n")

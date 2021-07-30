@@ -12,6 +12,7 @@ import {
 	Image,
 } from '@chakra-ui/react';
 import Link from './components/Link';
+import { useRouter } from 'next/router'
 import React, { useState, useEffect } from "react"
 type dataStruct = {
 	ID: string
@@ -40,12 +41,11 @@ var returnData: dataStruct = {
 	Goods: "",
 }
 const Template = () => {
-
+	const router = useRouter()
 	useEffect(() => {
 		fetch("http://localhost:8080/user", {
 			mode: "cors",
 			method: "GET",
-			headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
 			credentials: 'include',
 		}).then((res) => res.json())
 			.then((data) => {
@@ -70,6 +70,17 @@ const Template = () => {
 				console.log("データ", data)
 			})
 	}, [])
+	const Logout = () => {
+		fetch("http://localhost:8080/logout", {
+			mode: "cors",
+			method: "GET",
+			credentials: 'include',
+		}).then((res) => res.json())
+			.then(() => {
+				router.reload()
+
+			})
+	}
 	const [user, setUser] = useState<dataStruct>(returnData);
 	const [icon, setIcon] = useState<Blob>()
 	const [hasCookie, setHasCookie] = useState<boolean>(false);
@@ -99,7 +110,7 @@ const Template = () => {
 										<Link href="/post"><MenuItem>クイズを投稿する</MenuItem></Link>
 										<Link href="/config"><MenuItem>設定</MenuItem></Link>
 										<Link href="/terms"><MenuItem>利用規約</MenuItem></Link>
-										<MenuItem>ログアウト</MenuItem>
+										<MenuItem onClick={Logout}>ログアウト</MenuItem>
 									</MenuList>
 								</Menu>
 							</>

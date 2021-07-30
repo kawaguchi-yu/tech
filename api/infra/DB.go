@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -64,7 +65,7 @@ func DBCreateUser(c echo.Context, db *gorm.DB) error { //渡された値をDBに
 		return echo.ErrBadRequest
 	}
 	u.Password = string(hashedPassword)
-	fmt.Printf("%+v\n\n", u)
+	fmt.Printf("%+v\n", u)
 	result := db.Create(&u)
 	if result.Error != nil {
 		return c.JSON(http.StatusBadRequest, "メールアドレスが重複しています")
@@ -90,11 +91,20 @@ func Login(c echo.Context, db *gorm.DB) error { //emailとpasswordでjwt入りco
 	cookie := CreateCookie(JWTToken)
 	c.SetCookie(cookie)
 	return c.JSON(http.StatusOK, cookie)
-
+}
+func Logout(c echo.Context, db *gorm.DB) error { //emailとpasswordでjwt入りcookie貰える
+	cookie, err := c.Cookie("jwt")
+	if err != nil {
+		fmt.Printf("クッキー読み取りに失敗しました\n")
+		return c.JSON(http.StatusBadRequest, cookie)
+	}
+	cookie.Expires = time.Now()
+	c.SetCookie(cookie)
+	return c.JSON(http.StatusOK, cookie)
 }
 
 func ReadCookieReturnUser(c echo.Context, db *gorm.DB) error {
-	email, err := ReadCookie(c)
+	email, err := ReadCookieReturnEMail(c)
 	if err != nil {
 		fmt.Printf("クッキー読み取りに失敗しました\n")
 		return c.JSON(http.StatusBadRequest, nil)
@@ -106,7 +116,7 @@ func ReadCookieReturnUser(c echo.Context, db *gorm.DB) error {
 	return c.JSON(http.StatusOK, user)
 }
 func ReadCookieReturnIcon(c echo.Context, db *gorm.DB) error {
-	email, err := ReadCookie(c)
+	email, err := ReadCookieReturnEMail(c)
 	if err != nil {
 		fmt.Printf("クッキー読み取りに失敗しました\n")
 		return c.JSON(http.StatusBadRequest, nil)
@@ -131,7 +141,7 @@ func ReadCookieReturnIcon(c echo.Context, db *gorm.DB) error {
 }
 
 func ReadCookieReturnUserPost(c echo.Context, db *gorm.DB) error {
-	email, err := ReadCookie(c)
+	email, err := ReadCookieReturnEMail(c)
 	if err != nil {
 		fmt.Printf("クッキー読み取りに失敗しました\n")
 		return c.JSON(http.StatusBadRequest, nil)
@@ -144,7 +154,7 @@ func ReadCookieReturnUserPost(c echo.Context, db *gorm.DB) error {
 	var post []domain.Post
 	db.Where("user_id = ?", user.ID).Find(&post)
 	fmt.Printf("userIDは%v\n", user.ID)
-	fmt.Printf("処理は正常に終了しました%v\n", post)
+	fmt.Printf("Post引き出し処理は正常に終了しました\n")
 	return c.JSON(http.StatusOK, post)
 }
 
@@ -185,7 +195,7 @@ func SetIcon(c echo.Context, db *gorm.DB) error {
 	}
 
 	//ここまでが画像をローカルフォルダに保存する行程、ここからがuserのiconに画像データを入れる
-	email, err := ReadCookie(c)
+	email, err := ReadCookieReturnEMail(c)
 	if err != nil {
 		fmt.Printf("クッキー読み取りに失敗しました\n")
 		return c.JSON(http.StatusBadRequest, nil)
@@ -204,7 +214,7 @@ func SetIcon(c echo.Context, db *gorm.DB) error {
 func CreatePostQuiz(c echo.Context, db *gorm.DB) error {
 	post := new(domain.Post)
 	c.Bind(post)
-	email, err := ReadCookie(c)
+	email, err := ReadCookieReturnEMail(c)
 	if err != nil {
 		fmt.Printf("クッキー読み取りに失敗しました\n")
 		return c.JSON(http.StatusBadRequest, nil)
