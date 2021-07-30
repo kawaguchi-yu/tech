@@ -41,18 +41,12 @@ const Posts = () => {
 	const [answer, setAnswer] = useState<string>()
 	const setData = () => {
 		const hasData = getValues(["title", "answer", "wrongAnswer1", "wrongAnswer2", "wrongAnswer3", "explanation"])
-		// quizData.title = hasData[0]
-		// quizData.answer = hasData[1]
-		// quizData.wrongAnswer1 = hasData[2]
-		// quizData.wrongAnswer2 = hasData[3]
-		// quizData.wrongAnswer3 = hasData[4]
-		// quizData.explanation = hasData[5]
-		quizData.title = "この中でフロントエンド言語はどれ？"
-		quizData.answer = "JavaScript"
-		quizData.wrongAnswer1 = "Ruby"
-		quizData.wrongAnswer2 = "Go"
-		quizData.wrongAnswer3 = "PHP"
-		quizData.explanation = "JavaScriptだけがフロントエンド言語です"
+		quizData.title = hasData[0]
+		quizData.answer = hasData[1]
+		quizData.wrongAnswer1 = hasData[2]
+		quizData.wrongAnswer2 = hasData[3]
+		quizData.wrongAnswer3 = hasData[4]
+		quizData.explanation = hasData[5]
 	}
 	const RandomAnswer = () => {
 		let answer = [quizData.answer, quizData.wrongAnswer1, quizData.wrongAnswer2, quizData.wrongAnswer3]
@@ -77,7 +71,6 @@ const Posts = () => {
 	}
 	const ApiFetch = () => {
 		setData()
-		console.log(quizData)
 		fetch("http://localhost:8080/post", {
 			mode: "cors",
 			method: "POST",
