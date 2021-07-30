@@ -18,7 +18,7 @@ func Routing(e *echo.Echo) {
 		return nil
 	})
 	e.POST("/getuserpost", func(c echo.Context) error {
-		ReadCookieReturnUserPost(c, GetDB())
+		ReadURLReturnUserPost(c, GetDB())
 		fmt.Printf("ReadCookie.return.userpost\n")
 		return nil
 	})

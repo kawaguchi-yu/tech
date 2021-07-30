@@ -140,15 +140,12 @@ func ReadCookieReturnIcon(c echo.Context, db *gorm.DB) error {
 	return c.File(user.Icon)
 }
 
-func ReadCookieReturnUserPost(c echo.Context, db *gorm.DB) error {
-	email, err := ReadCookieReturnEMail(c)
-	if err != nil {
-		fmt.Printf("クッキー読み取りに失敗しました\n")
-		return c.JSON(http.StatusBadRequest, nil)
-	}
+func ReadURLReturnUserPost(c echo.Context, db *gorm.DB) error {
+	u := new(domain.User)
+	c.Bind(u) //これでフロントエンド側のurlの名前を受け取る
 	var user domain.User
-	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
-		fmt.Printf("ユーザー取得に失敗しました\n")
+	if err := db.First(&user, "name=?", u.Name).Error; err != nil {
+		fmt.Printf("ユーザー取得に失敗しました%v\n", u.Name)
 		return c.JSON(http.StatusBadRequest, nil)
 	}
 	var post []domain.Post

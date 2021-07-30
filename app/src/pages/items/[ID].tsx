@@ -65,8 +65,8 @@ const Fuga = () => {
           {answer && <>解説文{router.query.Explanation}</>}
         </Stack>
 
-        <Link href="/myPages">
-          <Box>myPagesにもどる</Box>
+        <Link href="/">
+          <Box>戻る</Box>
         </Link>
       </Stack>
     </>)

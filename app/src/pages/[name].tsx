@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react"
+import { useRouter } from "next/router"
 import {
 	chakra,
 	Stack,
-	Button,
-	Heading,
 	Box,
 	VStack,
 } from '@chakra-ui/react';
 import Link from "next/link";
-import Template from "../template";
+import Template from "./template";
 type user = {
 	ID: number
 	CreatedAt: string
@@ -16,7 +15,7 @@ type user = {
 	DeletedAt: string
 	UserID: number
 	Title: string
-	Answer:string
+	Answer: string
 	WrongAnswer1: string
 	WrongAnswer2: string
 	WrongAnswer3: string
@@ -24,23 +23,41 @@ type user = {
 	Tags: any
 	Goods: any
 };
-
+type URLPath = {
+	Name: string | string[]
+}
 const MyPages = (): JSX.Element => {
+
+	const router = useRouter()
+	const [URLQuery, setURLQuery] = useState<URLPath>()
 	useEffect(() => {
-		fetch("http://localhost:8080/getuserpost", {
-			mode: "cors",
-			method: "POST",
-			headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
-			credentials: 'include',//bodyの代わりにcookieを送る
-		})
+		if (router.asPath !== router.route) {
+			const queryname: URLPath = { Name: router.query.name }
+			setURLQuery(queryname);
+		}
+	}, [router])
+	useEffect(() => {
+		if (URLQuery) {
+			fetch("http://localhost:8080/getuserpost", {
+				mode: "cors",
+				method: "POST",
+				headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
+				credentials: 'include',//bodyの代わりにcookieを送る
+				body: JSON.stringify(URLQuery)
+			})
 			.then((res) => res.json())
 			.then((data) => {
 				data.forEach(array =>
 					setPostDatas(postDatas => [...postDatas, array]),
-					console.log(data)
+					console.log("貰ってきたデータ", data)
 				)
 			})
-	}, [])
+			.catch(() => {
+				console.error("データを貰ってくることができませんでした")
+				console.log("URLQuery", URLQuery)
+			})
+		}
+	}, [URLQuery])
 	const [postDatas, setPostDatas] = useState<user[]>([])
 	const PostsView = () => {
 		return (<>
@@ -62,11 +79,11 @@ const MyPages = (): JSX.Element => {
 				}
 				return (
 					<VStack key={userInfo.ID} padding="10" border="solid 1px">
-						<Box>{postData.CreatedAt.substring(0,10)}</Box>
+						<Box>{postData.CreatedAt.substring(0, 10)}</Box>
 						<Link
 							as={`/items/${userInfo.ID}`}
-							href={{ pathname:`/items/[ID]`,query: userInfo}}
-						passHref>
+							href={{ pathname: `/items/[ID]`, query: userInfo }}
+							passHref>
 							<Box>{userInfo.Title}</Box>
 						</Link>
 					</VStack>
@@ -86,6 +103,7 @@ const MyPages = (): JSX.Element => {
 						<PostsView />
 					</VStack>
 				</Stack>
+				<>{router.query.name}</>
 			</chakra.div>
 		</>
 	)
