@@ -139,7 +139,25 @@ func ReadCookieReturnIcon(c echo.Context, db *gorm.DB) error {
 	}
 	return c.File(user.Icon)
 }
-
+func ReturnAllUser(c echo.Context, db *gorm.DB) error { //全user情報を渡す
+	var users []domain.User
+	db.Find(&users)
+	var posts []domain.Post
+	db.Find(&posts)
+	var returnUsers []domain.User
+	for _, user := range users {
+		for _, post := range posts {
+			if post.UserID == user.ID {
+				user.Posts = append(user.Posts, post)
+			}
+		}
+		if user.Posts != nil {
+			returnUsers = append(returnUsers, user)
+		}
+	}
+	fmt.Printf("ReturnAllUserは正常に終了しました\n")
+	return c.JSON(http.StatusOK, returnUsers)
+}
 func ReadURLReturnUserPost(c echo.Context, db *gorm.DB) error {
 	u := new(domain.User)
 	c.Bind(u) //これでフロントエンド側のurlの名前を受け取る
@@ -221,7 +239,22 @@ func CreatePostQuiz(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusBadRequest, nil)
 	}
 	post.UserID = user.ID
-	db.Create(&post)
+	user.Posts = []domain.Post{{
+		UserID:       post.UserID,
+		Title:        post.Title,
+		Answer:       post.Answer,
+		WrongAnswer1: post.WrongAnswer1,
+		WrongAnswer2: post.WrongAnswer2,
+		WrongAnswer3: post.WrongAnswer3,
+		Explanation:  post.Explanation,
+		Tags:         post.Tags,
+		Goods:        post.Goods,
+	}}
+	db.Select("Posts").Updates(&user)
+	err = db.Session(&gorm.Session{FullSaveAssociations: true}).Model(&user).Association("Posts").Append(&user.Posts)
+	if err != nil {
+		fmt.Printf("%v/n", err)
+	}
 	fmt.Printf("処理は正常に終了しました\n")
 	return c.JSON(http.StatusOK, post)
 }

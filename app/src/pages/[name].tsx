@@ -31,7 +31,7 @@ const MyPages = (): JSX.Element => {
 	const router = useRouter()
 	const [URLQuery, setURLQuery] = useState<URLPath>()
 	useEffect(() => {
-		if (router.asPath !== router.route) {
+		if (router.asPath !== router.route) {//厳密不等価
 			const queryname: URLPath = { Name: router.query.name }
 			setURLQuery(queryname);
 		}
@@ -79,7 +79,7 @@ const MyPages = (): JSX.Element => {
 				}
 				return (
 					<VStack key={userInfo.ID} padding="10" border="solid 1px">
-						<Box>{postData.CreatedAt.substring(0, 10)}</Box>
+						<Box>{router.query.name}が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
 						<Link
 							as={`/items/${userInfo.ID}`}
 							href={{ pathname: `/items/[ID]`, query: userInfo }}
@@ -103,7 +103,6 @@ const MyPages = (): JSX.Element => {
 						<PostsView />
 					</VStack>
 				</Stack>
-				<>{router.query.name}</>
 			</chakra.div>
 		</>
 	)

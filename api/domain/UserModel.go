@@ -9,7 +9,7 @@ type User struct {
 	Name      string `json:"Name" gorm:"unique"`
 	EMail     string `json:"EMail" gorm:"unique"`
 	Password  string `json:"Password"`
-	Posts     []Post
+	Posts     []Post `gorm:"foreignKey:UserID"`
 	Profile   Profile
 	ProfileID uint
 	Goods     []Good

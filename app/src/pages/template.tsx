@@ -14,7 +14,7 @@ import {
 import Link from './components/Link';
 import { useRouter } from 'next/router'
 import React, { useState, useEffect } from "react"
-type dataStruct = {
+type user = {
 	ID: string
 	CreatedAt: string
 	UpdatedAt: string
@@ -27,7 +27,7 @@ type dataStruct = {
 	ProfileID: string
 	Goods: string
 };
-var returnData: dataStruct = {
+var returnData: user = {
 	ID: "",
 	CreatedAt: "",
 	UpdatedAt: "",
@@ -50,7 +50,7 @@ const Template = () => {
 		}).then((res) => res.json())
 			.then((data) => {
 				const result = JSON.stringify(data)
-				const result2: dataStruct = JSON.parse(result)
+				const result2: user = JSON.parse(result)
 				returnData = result2
 				setUser(returnData)
 				if (returnData == null) {
@@ -67,7 +67,6 @@ const Template = () => {
 		}).then((res) => res.blob())
 			.then((data) => {
 				setIcon(data);
-				console.log("データ", data)
 			})
 	}, [])
 	const Logout = () => {
@@ -81,7 +80,7 @@ const Template = () => {
 
 			})
 	}
-	const [user, setUser] = useState<dataStruct>(returnData);
+	const [user, setUser] = useState<user>(returnData);
 	const [icon, setIcon] = useState<Blob>()
 	const [hasCookie, setHasCookie] = useState<boolean>(false);
 	return (

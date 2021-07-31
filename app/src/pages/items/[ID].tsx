@@ -41,14 +41,8 @@ const Fuga = () => {
     <>
       <Box><Template /></Box>
       <Stack align="center">
-        <Box>記事のID: {router.query.ID}</Box>
-        <Box>記事の名前: {router.query.Title}</Box>
-
-        <Box>記事の説明: {router.query.Explanation}</Box>
-
-
         <Stack>
-          <>問題文:{router.query.Title}</>
+          <>問題:　　{router.query.Title}</>
         </Stack>
         <HStack>
           {choicesData && <>
@@ -59,10 +53,10 @@ const Fuga = () => {
           </>}</HStack>
         <Stack>
           <>{answer}</>
-          {answer && <>正解は{router.query.Answer}です</>}
+          {answer=="不正解！" && <>正解は{router.query.Answer}です</>}
         </Stack>
         <Stack>
-          {answer && <>解説文{router.query.Explanation}</>}
+          {answer && <>解説文:  {router.query.Explanation}</>}
         </Stack>
 
         <Link href="/">
