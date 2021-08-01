@@ -1,21 +1,14 @@
 import React, { useState } from "react"
 import { useForm } from "react-hook-form";
 import {
-	Box,
 	FormControl,
 	FormLabel,
 	Input,
-	Checkbox,
 	HStack,
 	Stack,
 	Button,
-	RadioGroup,
-	Radio,
-	FormErrorMessage,
 } from '@chakra-ui/react';
-import Link from './components/Link';
 import Template from "./template";
-import { randomBytes } from "node:crypto";
 type quizType = {
 	title: string
 	answer: string

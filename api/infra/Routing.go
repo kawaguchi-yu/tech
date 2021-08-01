@@ -32,6 +32,11 @@ func Routing(e *echo.Echo) {
 		fmt.Printf("post処理が呼ばれました\n")
 		return nil
 	})
+	e.POST("/deletepost", func(c echo.Context) error {
+		DeletePost(c, GetDB())
+		fmt.Printf("deletepost処理が呼ばれました\n")
+		return nil
+	})
 	e.POST("/signup", func(c echo.Context) error {
 		DBCreateUser(c, GetDB())
 		return nil

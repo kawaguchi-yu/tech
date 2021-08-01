@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import Template from "./template";
 type user = {
+	Name: string|string[]
 	ID: number
 	CreatedAt: string
 	UpdatedAt: string
@@ -46,11 +47,13 @@ const MyPages = (): JSX.Element => {
 				body: JSON.stringify(URLQuery)
 			})
 			.then((res) => res.json())
-			.then((data) => {
-				data.forEach(array =>
-					setPostDatas(postDatas => [...postDatas, array]),
-					console.log("貰ってきたデータ", data)
-				)
+			.then((datas) => {
+				const userDatas:user[] =datas
+				userDatas.forEach(userData =>
+					{userData.Name = URLQuery.Name
+					setPostDatas(postDatas => [...postDatas, userData]),
+					console.log("貰ってきたデータ", datas)
+					})
 			})
 			.catch(() => {
 				console.error("データを貰ってくることができませんでした")
@@ -63,6 +66,7 @@ const MyPages = (): JSX.Element => {
 		return (<>
 			{postDatas.map((postData) => {
 				const userInfo: user = {
+					Name: postData.Name,
 					ID: postData.ID,
 					CreatedAt: postData.CreatedAt,
 					UpdatedAt: postData.UpdatedAt,

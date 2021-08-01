@@ -258,6 +258,33 @@ func CreatePostQuiz(c echo.Context, db *gorm.DB) error {
 	fmt.Printf("処理は正常に終了しました\n")
 	return c.JSON(http.StatusOK, post)
 }
+func DeletePost(c echo.Context, db *gorm.DB) error {
+	type postData struct {
+		ID     uint
+		UserID uint
+	}
+	post := new(postData)
+	c.Bind(post)
+	fmt.Printf("postid%v\n", post)         //postのIDとUserIDが入ってる
+	email, err := ReadCookieReturnEMail(c) //クッキーからemailを読み取る
+	if err != nil {
+		fmt.Printf("記事の削除権限がありません\n")
+		return c.JSON(http.StatusBadRequest, "削除権限がありません")
+	}
+	user := new(domain.User)
+	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
+		return c.JSON(http.StatusBadRequest, "db接続に失敗しました\n")
+	} //dbから現在のユーザーデータを取得する
+	if user.ID == post.UserID {
+		db.Delete(&domain.Post{}, post.ID)
+		fmt.Printf("postから%vIDを削除しました\n", post.ID)
+	} else {
+		fmt.Printf("削除権限がありませんuser.ID=%vpost.UserID=%v\n", user.ID, post.UserID)
+		return c.JSON(http.StatusBadRequest, "削除権限がありません")
+	}
+	fmt.Printf("正常に終了しました%v\n", post.ID)
+	return c.JSON(http.StatusOK, "正常に終了しました")
+}
 func getUser(email string, db *gorm.DB) (domain.User, error) {
 	var user domain.User
 	if err := db.First(&user, "e_mail = ?", email).Error; err != nil {

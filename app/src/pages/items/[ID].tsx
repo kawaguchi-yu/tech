@@ -14,6 +14,23 @@ const Fuga = () => {
   console.log(router)
   const [answer, setAnswer] = useState<string>()
   const [choicesData, setChoicesData] = useState<any>()
+  const [post, setpost] = useState()
+  const DeleteFetch = () => {
+    const ArticleData = {ID: Number(router.query.ID), UserID: Number(router.query.UserID)}
+    console.log(ArticleData)
+    fetch("http://localhost:8080/deletepost", {
+      mode: "cors",
+      method: "POST",
+      headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
+      credentials: 'include',
+      body: JSON.stringify(ArticleData),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setpost(data)
+      })
+      .catch((err) => { console.log(err) })
+  };
   const RandomAnswer = () => {
     const choices = [
       router.query.Answer,
@@ -42,7 +59,10 @@ const Fuga = () => {
       <Box><Template /></Box>
       <Stack align="center">
         <Stack>
-          <>問題:　　{router.query.Title}</>
+          <Box>記事のID　{router.query.ID}</Box>
+          <Box>記事のUserID　{router.query.UserID}</Box>
+          <Box>記事制作者　{router.query.Name}</Box>
+          <Box>問題:　　{router.query.Title}</Box>
         </Stack>
         <HStack>
           {choicesData && <>
@@ -53,7 +73,7 @@ const Fuga = () => {
           </>}</HStack>
         <Stack>
           <>{answer}</>
-          {answer=="不正解！" && <>正解は{router.query.Answer}です</>}
+          {answer == "不正解！" && <>正解は{router.query.Answer}です</>}
         </Stack>
         <Stack>
           {answer && <>解説文:  {router.query.Explanation}</>}
@@ -62,6 +82,8 @@ const Fuga = () => {
         <Link href="/">
           <Box>戻る</Box>
         </Link>
+        <Button onClick={DeleteFetch}>記事を削除する</Button>
+        {post && <>{JSON.stringify(post)}</>}
       </Stack>
     </>)
 }

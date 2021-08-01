@@ -8,8 +8,8 @@ import {
 import Template from "./template";
 const Config = () => {
 	const [view, setview] = useState<string>();
-	const [posts, setPosts] = useState<Blob>();
 	const [iconData, setIconData] = useState<FormData>();
+	const [posts, setPosts] = useState<Blob>();
 	const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setview(window.URL.createObjectURL(e.target.files[0]))
 		const image = new FormData()

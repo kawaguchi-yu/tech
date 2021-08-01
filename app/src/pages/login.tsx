@@ -5,11 +5,11 @@ import {
 	chakra,
 	Flex,
 	Box,
-	FormControl,
 	Input,
 	Stack,
 	Button,
 	Heading,
+	FormControl,
 	useColorModeValue,
 } from '@chakra-ui/react';
 import router from "next/router";
@@ -25,7 +25,7 @@ const Login = (): JSX.Element => {
 	const { register, handleSubmit, formState, formState: { errors }, getValues } = useForm<LoginData>({
 		mode: "onTouched"
 	});
-	const [posts, setPosts] = useState([]);
+	const [posts, setPosts] = useState<string>();
 
 	const setData = () => {
 		const hasData = getValues(["EMail", "Password"]);
@@ -52,7 +52,6 @@ const Login = (): JSX.Element => {
 				setPosts(data)
 				console.log(data)
 			}else{
-				setPosts(data)
 				router.back()
 			}
 			})
@@ -120,7 +119,7 @@ const Login = (): JSX.Element => {
 										disabled={!formState.isValid}>
 										ログイン
 									</Button>
-									<Heading>{JSON.stringify(posts)}</Heading>
+									<Heading>{posts != "" && <>{JSON.stringify(posts)}</>}</Heading>
 								</Stack>
 							</Stack>
 						</Box>

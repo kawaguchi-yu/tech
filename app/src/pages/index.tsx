@@ -5,7 +5,8 @@ import {
 	VStack,
 	Button,
 } from '@chakra-ui/react';
-import Link from "next/link";
+import NextLink from "next/link";
+import Link from "./components/Link"
 import React, { useState, useEffect } from "react"
 import Template from "./template";
 type user = {
@@ -48,7 +49,6 @@ const Home = (): JSX.Element => {
 				const userDatas: user[] = datas
 				console.log("貰ってきたデータ", datas)
 				userDatas.forEach(userData =>//user型データがいくつか入ってる
-
 					userData.Posts.forEach(userDataPost =>//user型データの中のpost
 					{
 						userDataPost.Name = userData.Name,
@@ -82,12 +82,12 @@ const Home = (): JSX.Element => {
 				return (
 					<VStack key={userInfo.ID} padding="10" border="solid 1px">
 						<Box bgColor ="aquamarine"><Link href={`/${postData.Name}`}>{postData.Name}</Link>が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
-						<Link
+						<NextLink
 							as={`/items/${userInfo.ID}`}
 							href={{ pathname: `/items/[ID]`, query: userInfo }}
 							passHref>
-							<Box bgColor ="azure">{userInfo.Title}</Box>
-						</Link>
+							<Box as="a" fontWeight="bold" bgColor ="azure">{userInfo.Title}</Box>
+						</NextLink>
 					</VStack>
 				)
 			})}
@@ -100,7 +100,7 @@ const Home = (): JSX.Element => {
 				<Template />
 				クイズを投稿して知見を共有しませんか！
 				<Stack direction="row" align="center">
-					<Link href="/post" passHref>
+					<Link href="/post">
 						<Button colorScheme="teal" variant="solid">
 							クイズを投稿する
 						</Button>
