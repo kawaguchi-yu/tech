@@ -197,8 +197,8 @@ func SetIcon(c echo.Context, db *gorm.DB) error {
 	iconModel := strings.Split(icon.Filename, ".")
 	iconName := iconModel[0]
 	extension := iconModel[1]
-	dst, err := os.Create(fmt.Sprintf("%s_out.%s\n", iconName, extension)) //新しいファイルを作り、名前を決める
-	if err != nil {
+	dst, err := os.Create(fmt.Sprintf("%s_out.%s", iconName, extension))
+	if err != nil { //"%s_out.%s"ここに\nを付け足すな！！！！！
 		fmt.Printf("ファイルが作れませんでした\n")
 		return c.JSON(http.StatusBadRequest, "ファイルが作れませんでした")
 	}
@@ -226,7 +226,7 @@ func SetIcon(c echo.Context, db *gorm.DB) error {
 	//例c.File(test.jpg)→test.jpgのファイルが送られる。
 }
 
-func CreatePostQuiz(c echo.Context, db *gorm.DB) error {
+func CreatePost(c echo.Context, db *gorm.DB) error {
 	post := new(domain.Post)
 	c.Bind(post)
 	email, err := ReadCookieReturnEMail(c)
@@ -257,6 +257,31 @@ func CreatePostQuiz(c echo.Context, db *gorm.DB) error {
 	}
 	fmt.Printf("処理は正常に終了しました\n")
 	return c.JSON(http.StatusOK, post)
+}
+func UpDataPost(c echo.Context, db *gorm.DB) error {
+	post := new(domain.Post)
+	c.Bind(post)
+	email, err := ReadCookieReturnEMail(c)
+	if err != nil {
+		fmt.Printf("クッキー読み取りに失敗しました\n")
+		return c.JSON(http.StatusBadRequest, nil)
+	}
+	user := new(domain.User)
+	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
+		return c.JSON(http.StatusBadRequest, nil)
+	}
+	if user.ID == post.UserID {
+		result := db.Model(&domain.Post{}).Where("Id =?", post.ID).Updates(post)
+		if result.Error != nil {
+			fmt.Printf("アップデートに失敗しました\n")
+			return c.JSON(http.StatusBadRequest, "アップデートに失敗しました")
+		}
+		fmt.Printf("postの%vをアップデートしました\n", post.ID)
+	} else {
+		fmt.Printf("編集権限がありませんuser.ID=%vpost.UserID=%v\n", user.ID, post.UserID)
+		return c.JSON(http.StatusBadRequest, "編集権限がありません")
+	}
+	return c.JSON(http.StatusOK, "正常に終了しました")
 }
 func DeletePost(c echo.Context, db *gorm.DB) error {
 	type postData struct {

@@ -8,16 +8,21 @@ import {
 	Stack,
 	Button,
 } from '@chakra-ui/react';
-import Template from "./template";
+import Template from "../template";
+import { useRouter } from 'next/router'
 type quizType = {
-	title: string
-	answer: string
-	wrongAnswer1: string
-	wrongAnswer2: string
-	wrongAnswer3: string
-	explanation: string
+	ID: number
+	UserID: number
+	title: string|string[]
+	answer: string|string[]
+	wrongAnswer1: string|string[]
+	wrongAnswer2: string|string[]
+	wrongAnswer3: string|string[]
+	explanation: string|string[]
 }
 const quizData: quizType = {
+	ID: null,
+	UserID: null,
 	title: "",
 	answer: "",
 	wrongAnswer1: "",
@@ -32,14 +37,18 @@ const Posts = () => {
 	const [posts, setPosts] = useState([])
 	const [randomAnswer, setRandomAnswer] = useState([])
 	const [answer, setAnswer] = useState<string>()
+  const router = useRouter();
 	const setData = () => {
 		const hasData = getValues(["title", "answer", "wrongAnswer1", "wrongAnswer2", "wrongAnswer3", "explanation"])
+		quizData.ID = Number(router.query.ID)
+		quizData.UserID = Number(router.query.UserID)
 		quizData.title = hasData[0]
 		quizData.answer = hasData[1]
 		quizData.wrongAnswer1 = hasData[2]
 		quizData.wrongAnswer2 = hasData[3]
 		quizData.wrongAnswer3 = hasData[4]
 		quizData.explanation = hasData[5]
+		console.log(quizData)
 	}
 	const RandomAnswer = () => {
 		let answer = [quizData.answer, quizData.wrongAnswer1, quizData.wrongAnswer2, quizData.wrongAnswer3]
@@ -62,9 +71,9 @@ const Posts = () => {
 			setAnswer("不正解！")
 		}
 	}
-	const ApiFetch = () => {
+	const upDateFetch = () => {
 		setData()
-		fetch("http://localhost:8080/post", {
+		fetch("http://localhost:8080/updatepost", {
 			mode: "cors",
 			method: "POST",
 			headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
@@ -85,6 +94,7 @@ const Posts = () => {
 			<FormLabel>問題文</FormLabel>
 			<Input
 				type="string"
+        defaultValue={router.query.Title}
 				placeholder="例:この中でフロントエンド言語はどれ？"
 				{...register("title", {
 					required: "タイトルを入力してください",
@@ -98,6 +108,7 @@ const Posts = () => {
 				<FormLabel>正答</FormLabel>
 				<Input
 					type="body"
+          defaultValue={router.query.Answer}
 					placeholder="例:JavaScript"
 					{...register("answer", {
 						required: "回答を入力してください",
@@ -111,6 +122,7 @@ const Posts = () => {
 				<FormLabel>誤答</FormLabel>
 				<Input
 					type="body"
+          defaultValue={router.query.WrongAnswer1}
 					placeholder="例:Go"
 					{...register("wrongAnswer1", {
 						required: "回答を入力してください",
@@ -124,6 +136,7 @@ const Posts = () => {
 				<FormLabel>誤答</FormLabel>
 				<Input
 					type="body"
+          defaultValue={router.query.WrongAnswer2}
 					placeholder="例:PHP"
 					{...register("wrongAnswer2", {
 						required: "回答を入力してください",
@@ -137,6 +150,7 @@ const Posts = () => {
 				<FormLabel>誤答</FormLabel>
 				<Input
 					type="body"
+          defaultValue={router.query.WrongAnswer3}
 					placeholder="例:Ruby"
 					{...register("wrongAnswer3", {
 						required: "回答を入力してください",
@@ -151,6 +165,7 @@ const Posts = () => {
 				<FormLabel>解説文</FormLabel>
 				<Input
 					type="body"
+          defaultValue={router.query.Explanation}
 					placeholder="JavaScriptだけがフロントエンド言語だよ！"
 					{...register("explanation", {
 						required: "解説文を入力してください",
@@ -161,9 +176,9 @@ const Posts = () => {
 		</Stack>
 		<Button type="submit"
 			colorScheme="teal"
-			onClick={ApiFetch}
+			onClick={upDateFetch}
 			disabled={!formState.isValid}
-		>送信</Button>
+		>更新</Button>
 		<Stack>
 			<Button onClick={test}>プレビュー</Button>
 		</Stack>

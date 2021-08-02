@@ -28,8 +28,13 @@ func Routing(e *echo.Echo) {
 		return nil
 	})
 	e.POST("/post", func(c echo.Context) error {
-		CreatePostQuiz(c, GetDB())
+		CreatePost(c, GetDB())
 		fmt.Printf("post処理が呼ばれました\n")
+		return nil
+	})
+	e.POST("/updatepost", func(c echo.Context) error {
+		UpDataPost(c, GetDB())
+		fmt.Printf("updatepost処理が呼ばれました\n")
 		return nil
 	})
 	e.POST("/deletepost", func(c echo.Context) error {
@@ -52,7 +57,7 @@ func Routing(e *echo.Echo) {
 	})
 	e.POST("/seticon", func(c echo.Context) error {
 		SetIcon(c, GetDB())
-		fmt.Printf("SetIcon\n")
+		fmt.Printf("SetIcon処理が呼ばれました\n")
 		return nil
 	})
 }

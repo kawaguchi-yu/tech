@@ -3,21 +3,64 @@ import {
   Stack,
   Button,
   Box,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from '@chakra-ui/react';
 import React, { useState } from "react"
 import { useRouter } from 'next/router'
+import NextLink from "next/link";
 import Link from "../components/Link"
 import { useEffect } from 'react';
 import Template from '../template';
+type user = {
+	ID: string
+	CreatedAt: string
+	UpdatedAt: string
+	DeletedAt: string
+	Name: string
+	EMail: string
+	Password: string
+	Posts: string
+	Profile: string
+	ProfileID: string
+	Goods: string
+};
+var returnData: user = {
+	ID: "",
+	CreatedAt: "",
+	UpdatedAt: "",
+	DeletedAt: "",
+	Name: "",
+	EMail: "",
+	Password: "",
+	Posts: "",
+	Profile: "",
+	ProfileID: "",
+	Goods: "",
+}
 const Fuga = () => {
   const router = useRouter();
-  console.log(router)
   const [answer, setAnswer] = useState<string>()
   const [choicesData, setChoicesData] = useState<any>()
   const [post, setpost] = useState()
+  const [user, setUser] = useState<user>(returnData);
+  console.log(user)
+  useEffect(() => {
+		fetch("http://localhost:8080/user", {
+			mode: "cors",
+			method: "GET",
+			credentials: 'include',
+		}).then((res) => res.json())
+			.then((data) => {
+				const result = JSON.stringify(data)
+				const result2: user = JSON.parse(result)
+				setUser(result2)
+			})
+    },[])
   const DeleteFetch = () => {
-    const ArticleData = {ID: Number(router.query.ID), UserID: Number(router.query.UserID)}
-    console.log(ArticleData)
+    const ArticleData = { ID: Number(router.query.ID), UserID: Number(router.query.UserID) }
     fetch("http://localhost:8080/deletepost", {
       mode: "cors",
       method: "POST",
@@ -82,7 +125,24 @@ const Fuga = () => {
         <Link href="/">
           <Box>戻る</Box>
         </Link>
-        <Button onClick={DeleteFetch}>記事を削除する</Button>
+        {router.query.Name==user.Name && 
+        <Menu>
+          <MenuButton as={Button} h={10} p={2}>
+            ...
+          </MenuButton>
+          <MenuList>
+            <MenuItem>
+            <NextLink
+							as={`/post/${router.query.ID}`}
+							href={{ pathname: `/post/[ID]`, query: router.query }}
+							passHref>
+							<Box>記事を編集する</Box>
+						</NextLink></MenuItem>
+            <MenuItem><Button onClick={DeleteFetch}>記事を削除する</Button></MenuItem>
+          </MenuList>
+        </Menu>}
+        
+        
         {post && <>{JSON.stringify(post)}</>}
       </Stack>
     </>)
