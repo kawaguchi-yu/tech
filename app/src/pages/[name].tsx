@@ -5,11 +5,26 @@ import {
 	Stack,
 	Box,
 	VStack,
+	Image,
 } from '@chakra-ui/react';
 import Link from "next/link";
 import Template from "./template";
 type user = {
-	Name: string|string[]
+	ID: string
+	CreatedAt: string
+	UpdatedAt: string
+	DeletedAt: string
+	Name: string
+	EMail: string
+	Password: string
+	Posts: post[]
+	Profile: string
+	ProfileID: string
+	Goods: string
+	Icon: string
+};
+type post = {
+	Name: string//userの名前を入れる
 	ID: number
 	CreatedAt: string
 	UpdatedAt: string
@@ -23,9 +38,10 @@ type user = {
 	Explanation: string
 	Tags: any
 	Goods: any
+	Icon: Blob
 };
 type URLPath = {
-	Name: string | string[]
+	Name: string
 }
 const MyPages = (): JSX.Element => {
 
@@ -33,7 +49,7 @@ const MyPages = (): JSX.Element => {
 	const [URLQuery, setURLQuery] = useState<URLPath>()
 	useEffect(() => {
 		if (router.asPath !== router.route) {//厳密不等価
-			const queryname: URLPath = { Name: router.query.name }
+			const queryname: URLPath = { Name: String(router.query.name)}
 			setURLQuery(queryname);
 		}
 	}, [router])
@@ -48,24 +64,31 @@ const MyPages = (): JSX.Element => {
 			})
 			.then((res) => res.json())
 			.then((datas) => {
-				const userDatas:user[] =datas
-				userDatas.forEach(userData =>
-					{userData.Name = URLQuery.Name
-					setPostDatas(postDatas => [...postDatas, userData]),
+				const userData: user = datas
+				let bin = atob(userData.Icon.replace(/^.*,/, ''));
+					let buffer = new Uint8Array(bin.length);
+					for (let i = 0; i < bin.length; i++) {
+						buffer[i] = bin.charCodeAt(i);
+					} let blob = new Blob([buffer.buffer], {
+						type: "image/jpeg"
+					});
+				userData.Posts.forEach(postData =>
+					{postData.Name = userData.Name
+						postData.Icon = blob
+					setPostDatas(postDatas => [...postDatas, postData]),
 					console.log("貰ってきたデータ", datas)
 					})
 			})
 			.catch(() => {
 				console.error("データを貰ってくることができませんでした")
-				console.log("URLQuery", URLQuery)
 			})
 		}
 	}, [URLQuery])
-	const [postDatas, setPostDatas] = useState<user[]>([])
+	const [postDatas, setPostDatas] = useState<post[]>([])
 	const PostsView = () => {
 		return (<>
 			{postDatas.map((postData) => {
-				const userInfo: user = {
+				const userInfo = {
 					Name: postData.Name,
 					ID: postData.ID,
 					CreatedAt: postData.CreatedAt,
@@ -83,6 +106,10 @@ const MyPages = (): JSX.Element => {
 				}
 				return (
 					<VStack key={userInfo.ID} padding="10" border="solid 1px">
+						<Image boxSize="50px"
+							borderRadius="full"
+							src={(window.URL.createObjectURL(postData.Icon))}
+							alt="select picture" />
 						<Box>{router.query.name}が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
 						<Link
 							as={`/items/${userInfo.ID}`}

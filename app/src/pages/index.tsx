@@ -4,6 +4,7 @@ import {
 	Box,
 	VStack,
 	Button,
+	Image,
 } from '@chakra-ui/react';
 import NextLink from "next/link";
 import Link from "./components/Link"
@@ -21,6 +22,7 @@ type user = {
 	Profile: string
 	ProfileID: string
 	Goods: string
+	Icon: string
 };
 type post = {
 	Name: string//userの名前を入れる
@@ -37,11 +39,12 @@ type post = {
 	Explanation: string
 	Tags: any
 	Goods: any
+	Icon: Blob
 };
 const Home = (): JSX.Element => {
 	const [postDatas, setPostDatas] = useState<post[]>([])
 	useEffect(() => {
-		fetch("http://localhost:8080/getalluser", {
+		fetch("http://localhost:8080/getalluserpost", {
 			mode: "cors",
 			method: "GET",
 		}).then((res) => res.json())
@@ -49,12 +52,21 @@ const Home = (): JSX.Element => {
 				const userDatas: user[] = datas
 				console.log("貰ってきたデータ", datas)
 				userDatas.forEach(userData =>//user型データがいくつか入ってる
+				{
+					let bin = atob(userData.Icon.replace(/^.*,/, ''));
+					let buffer = new Uint8Array(bin.length);
+					for (let i = 0; i < bin.length; i++) {
+						buffer[i] = bin.charCodeAt(i);
+					} let blob = new Blob([buffer.buffer], {
+						type: "image/jpeg"
+					});
 					userData.Posts.forEach(userDataPost =>//user型データの中のpost
 					{
 						userDataPost.Name = userData.Name,
-						setPostDatas(postDatas => [...postDatas, userDataPost])
+						userDataPost.Icon = blob
+							setPostDatas(postDatas => [...postDatas, userDataPost])
 					})
-				)
+				})
 			})
 			.catch(() => {
 				console.error("データを貰ってくることができませんでした")
@@ -63,7 +75,7 @@ const Home = (): JSX.Element => {
 	const PostsView = () => {
 		return (<>
 			{postDatas.map((postData) => {
-				const userInfo: post = {
+				const userInfo = {
 					Name: postData.Name,
 					ID: postData.ID,
 					CreatedAt: postData.CreatedAt,
@@ -79,14 +91,19 @@ const Home = (): JSX.Element => {
 					Tags: postData.Tags,
 					Goods: postData.Goods,
 				}
+
 				return (
 					<VStack key={userInfo.ID} padding="10" border="solid 1px">
-						<Box bgColor ="aquamarine"><Link href={`/${postData.Name}`}>{postData.Name}</Link>が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
+						<Image boxSize="50px"
+							borderRadius="full"
+							src={(window.URL.createObjectURL(postData.Icon))}
+							alt="select picture" />
+						<Box bgColor="aquamarine"><Link href={`/${postData.Name}`}>{postData.Name}</Link>が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
 						<NextLink
 							as={`/items/${userInfo.ID}`}
 							href={{ pathname: `/items/[ID]`, query: userInfo }}
 							passHref>
-							<Box as="a" fontWeight="bold" bgColor ="azure">{userInfo.Title}</Box>
+							<Box as="a" fontWeight="bold" bgColor="azure">{userInfo.Title}</Box>
 						</NextLink>
 					</VStack>
 				)

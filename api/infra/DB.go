@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"hello/server/domain"
@@ -130,31 +131,54 @@ func ReadCookieReturnIcon(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusBadRequest, "フォルダパスを取得できませんでした")
 	}
 	defer os.Chdir(prevDir) //もとに戻る
-	err = os.Chdir("img")   //imgディレクトリに移動する
-	if err != nil {
+	if err := os.Chdir("img"); err != nil {
 		return c.JSON(http.StatusBadRequest, "フォルダを移動できませんでした")
-	}
-	if user.Icon == "" {
-		return c.File("firsticon.jpg")
 	}
 	return c.File(user.Icon)
 }
-func ReturnAllUser(c echo.Context, db *gorm.DB) error { //全user情報を渡す
+func ReturnAllUserPost(c echo.Context, db *gorm.DB) error { //全user情報を渡す
 	var users []domain.User
 	db.Find(&users)
 	var posts []domain.Post
 	db.Find(&posts)
 	var returnUsers []domain.User
+	prevDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "フォルダパスを取得できませんでした")
+	}
+	defer os.Chdir(prevDir) //もとに戻る
+	if err := os.Chdir("img"); err != nil {
+		return c.JSON(http.StatusBadRequest, "フォルダを移動できませんでした")
+	}
 	for _, user := range users {
 		for _, post := range posts {
 			if post.UserID == user.ID {
 				user.Posts = append(user.Posts, post)
 			}
 		}
+		if user.Icon != "" {
+			fmt.Printf("userIcon=%vuserName=%v\n", user.Icon, user.Name)
+			file, err := os.Open(user.Icon)
+			if err != nil {
+				fmt.Printf("データを開けませんでした\n")
+				return c.JSON(http.StatusOK, "データを開けませんでした")
+			}
+			defer file.Close()
+			fi, err := file.Stat() //FileInfo interface
+			if err != nil {
+				fmt.Printf("データ取得に失敗しました\n")
+				return c.JSON(http.StatusOK, "データ取得に失敗しました")
+			}
+			size := fi.Size() //ファイルサイズ
+			data := make([]byte, size)
+			file.Read(data)
+			user.Icon = base64.StdEncoding.EncodeToString(data)
+		}
 		if user.Posts != nil {
 			returnUsers = append(returnUsers, user)
 		}
 	}
+
 	fmt.Printf("ReturnAllUserは正常に終了しました\n")
 	return c.JSON(http.StatusOK, returnUsers)
 }
@@ -166,11 +190,40 @@ func ReadURLReturnUserPost(c echo.Context, db *gorm.DB) error {
 		fmt.Printf("ユーザー取得に失敗しました%v\n", u.Name)
 		return c.JSON(http.StatusBadRequest, nil)
 	}
-	var post []domain.Post
-	db.Where("user_id = ?", user.ID).Find(&post)
+	var posts []domain.Post
+	db.Where("user_id = ?", user.ID).Find(&posts)
+	for _, post := range posts {
+		if post.UserID == user.ID {
+			user.Posts = append(user.Posts, post)
+		}
+	}
+	fmt.Printf("userIcon=%vuserName=%v\n", user.Icon, user.Name)
+	prevDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "フォルダパスを取得できませんでした")
+	}
+	defer os.Chdir(prevDir) //もとに戻る
+	if err := os.Chdir("img"); err != nil {
+		return c.JSON(http.StatusBadRequest, "フォルダを移動できませんでした")
+	}
+	file, err := os.Open(user.Icon)
+	if err != nil {
+		fmt.Printf("データを開けませんでした\n")
+		return c.JSON(http.StatusOK, "データを開けませんでした")
+	}
+	defer file.Close()
+	fi, err := file.Stat() //FileInfo interface
+	if err != nil {
+		fmt.Printf("データ取得に失敗しました\n")
+		return c.JSON(http.StatusOK, "データ取得に失敗しました")
+	}
+	size := fi.Size() //ファイルサイズ
+	data := make([]byte, size)
+	file.Read(data)
+	user.Icon = base64.StdEncoding.EncodeToString(data)
 	fmt.Printf("userIDは%v\n", user.ID)
 	fmt.Printf("Post引き出し処理は正常に終了しました\n")
-	return c.JSON(http.StatusOK, post)
+	return c.JSON(http.StatusOK, user)
 }
 
 func SetIcon(c echo.Context, db *gorm.DB) error {
@@ -190,8 +243,7 @@ func SetIcon(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusBadRequest, "フォルダパスを取得できませんでした")
 	}
 	defer os.Chdir(prevDir) //もとに戻る
-	err = os.Chdir("img")   //imgディレクトリに移動する
-	if err != nil {
+	if err := os.Chdir("img"); err != nil {
 		return c.JSON(http.StatusBadRequest, "フォルダを移動できませんでした")
 	}
 	iconModel := strings.Split(icon.Filename, ".")
