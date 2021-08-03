@@ -11,7 +11,7 @@ import {
 	Heading,
 	Image,
 } from '@chakra-ui/react';
-import { Link } from "@chakra-ui/react"
+import Link from "./components/Link"
 import { useRouter } from 'next/router'
 import React, { useState, useEffect } from "react"
 type user = {
@@ -22,24 +22,12 @@ type user = {
 	Name: string
 	EMail: string
 	Password: string
-	Posts: string
 	Profile: string
 	ProfileID: string
 	Goods: string
+	Icon: string
+	IconBlob: Blob
 };
-var returnData: user = {
-	ID: "",
-	CreatedAt: "",
-	UpdatedAt: "",
-	DeletedAt: "",
-	Name: "",
-	EMail: "",
-	Password: "",
-	Posts: "",
-	Profile: "",
-	ProfileID: "",
-	Goods: "",
-}
 const Template = () => {
 	const router = useRouter()
 	useEffect(() => {
@@ -49,24 +37,22 @@ const Template = () => {
 			credentials: 'include',
 		}).then((res) => res.json())
 			.then((data) => {
-				const result = JSON.stringify(data)
-				const result2: user = JSON.parse(result)
-				returnData = result2
-				setUser(returnData)
-				if (returnData == null) {
-					console.log("データはないよ！", returnData)
+				const userData: user = data
+				if (userData == null) {
+					console.log("データはないよ！", userData)
 				} else {
-					setHasCookie(true)
-					console.log("データはあるよ！", returnData)
+					console.log("ユーザーデータ",userData.Icon)
+					let bin = atob(userData.Icon.replace(/^.*,/, ''));
+						let buffer = new Uint8Array(bin.length);
+						for (let i = 0; i < bin.length; i++) {
+							buffer[i] = bin.charCodeAt(i);
+						} let blob = new Blob([buffer.buffer], {
+							type: "image/jpeg"
+						});
+						userData.IconBlob = blob
+					setUser(userData)
+					console.log("データはあるよ！", userData)
 				}
-			})
-		fetch("http://localhost:8080/icon", {
-			mode: "cors",
-			method: "GET",
-			credentials: 'include',
-		}).then((res) => res.blob())
-			.then((data) => {
-				setIcon(data);
 			})
 	}, [])
 	const Logout = () => {
@@ -79,9 +65,7 @@ const Template = () => {
 				router.reload()
 			})
 	}
-	const [user, setUser] = useState<user>(returnData);
-	const [icon, setIcon] = useState<Blob>()
-	const [hasCookie, setHasCookie] = useState<boolean>(false);
+	const [user, setUser] = useState<user>();
 	return (
 		<>
 			<Flex bg={useColorModeValue('gray.100', 'gray.900')} alignItems={'center'}>
@@ -93,14 +77,14 @@ const Template = () => {
 				<Spacer />
 				<Box mr={4}>
 					<Flex direction="row" align="center">
-						{hasCookie
+						{user
 							? <><Heading mr="4">welcome!{user.Name}</Heading>
 								<Spacer />
 								<Menu>
 									<MenuButton as={Button} h={16} p={2}>
-										{icon && <Image boxSize="50px"
+										{user.IconBlob && <Image boxSize="50px"
 											borderRadius="full"
-											src={(window.URL.createObjectURL(icon))}
+											src={(window.URL.createObjectURL(user.IconBlob))}
 											alt="select picture" />}
 									</MenuButton>
 									<MenuList>

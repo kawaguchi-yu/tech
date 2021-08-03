@@ -104,7 +104,43 @@ func Logout(c echo.Context, db *gorm.DB) error { //emailとpasswordでjwt入りc
 	return c.JSON(http.StatusOK, cookie)
 }
 
+func getIcon(userIcon string) string {
+	saveDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
+	if err != nil {
+		return "error"
+	}
+	defer os.Chdir(saveDir) //もとに戻る
+	if err := os.Chdir("img"); err != nil {
+		nowDir, err := os.Getwd()
+		if err != nil {
+			fmt.Printf("現在のディレクトリを取得できませんでした\n")
+		}
+		fmt.Printf("現在のディレクトリは:%v\n", nowDir)
+		return "error"
+	}
+	file, err := os.Open(userIcon)
+	if err != nil {
+		fmt.Printf("データを開けませんでした\n")
+		return "error"
+	}
+	defer file.Close()
+	fi, err := file.Stat() //FileInfo interface
+	if err != nil {
+		fmt.Printf("データ取得に失敗しました\n")
+		return "error"
+	}
+	size := fi.Size() //ファイルサイズ
+	data := make([]byte, size)
+	file.Read(data)
+	userIcon = base64.StdEncoding.EncodeToString(data)
+	return userIcon
+}
 func ReadCookieReturnUser(c echo.Context, db *gorm.DB) error {
+	nowDir, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("現在のディレクトリを取得できませんでした\n")
+	}
+	fmt.Printf("現在のディレクトリは:%v\n", nowDir)
 	email, err := ReadCookieReturnEMail(c)
 	if err != nil {
 		fmt.Printf("クッキー読み取りに失敗しました\n")
@@ -113,28 +149,12 @@ func ReadCookieReturnUser(c echo.Context, db *gorm.DB) error {
 	var user domain.User
 	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
 		return c.JSON(http.StatusBadRequest, nil)
+	}
+	user.Icon = getIcon(user.Icon)
+	if user.Icon == "error" {
+		return c.JSON(http.StatusOK, "base64エンコードに失敗しました")
 	}
 	return c.JSON(http.StatusOK, user)
-}
-func ReadCookieReturnIcon(c echo.Context, db *gorm.DB) error {
-	email, err := ReadCookieReturnEMail(c)
-	if err != nil {
-		fmt.Printf("クッキー読み取りに失敗しました\n")
-		return c.JSON(http.StatusBadRequest, nil)
-	}
-	var user domain.User
-	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, nil)
-	}
-	prevDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "フォルダパスを取得できませんでした")
-	}
-	defer os.Chdir(prevDir) //もとに戻る
-	if err := os.Chdir("img"); err != nil {
-		return c.JSON(http.StatusBadRequest, "フォルダを移動できませんでした")
-	}
-	return c.File(user.Icon)
 }
 func ReturnAllUserPost(c echo.Context, db *gorm.DB) error { //全user情報を渡す
 	var users []domain.User
@@ -142,12 +162,17 @@ func ReturnAllUserPost(c echo.Context, db *gorm.DB) error { //全user情報を�
 	var posts []domain.Post
 	db.Find(&posts)
 	var returnUsers []domain.User
-	prevDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
+	saveDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "フォルダパスを取得できませんでした")
 	}
-	defer os.Chdir(prevDir) //もとに戻る
+	defer os.Chdir(saveDir) //もとに戻る
 	if err := os.Chdir("img"); err != nil {
+		nowDir, err := os.Getwd()
+		if err != nil {
+			fmt.Printf("現在のディレクトリを取得できませんでした\n")
+		}
+		fmt.Printf("現在のディレクトリは:%v\n", nowDir)
 		return c.JSON(http.StatusBadRequest, "フォルダを移動できませんでした")
 	}
 	for _, user := range users {
@@ -198,29 +223,10 @@ func ReadURLReturnUserPost(c echo.Context, db *gorm.DB) error {
 		}
 	}
 	fmt.Printf("userIcon=%vuserName=%v\n", user.Icon, user.Name)
-	prevDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "フォルダパスを取得できませんでした")
+	user.Icon = getIcon(user.Icon)
+	if user.Icon == "" {
+		return c.JSON(http.StatusOK, "base64エンコードに失敗しました")
 	}
-	defer os.Chdir(prevDir) //もとに戻る
-	if err := os.Chdir("img"); err != nil {
-		return c.JSON(http.StatusBadRequest, "フォルダを移動できませんでした")
-	}
-	file, err := os.Open(user.Icon)
-	if err != nil {
-		fmt.Printf("データを開けませんでした\n")
-		return c.JSON(http.StatusOK, "データを開けませんでした")
-	}
-	defer file.Close()
-	fi, err := file.Stat() //FileInfo interface
-	if err != nil {
-		fmt.Printf("データ取得に失敗しました\n")
-		return c.JSON(http.StatusOK, "データ取得に失敗しました")
-	}
-	size := fi.Size() //ファイルサイズ
-	data := make([]byte, size)
-	file.Read(data)
-	user.Icon = base64.StdEncoding.EncodeToString(data)
 	fmt.Printf("userIDは%v\n", user.ID)
 	fmt.Printf("Post引き出し処理は正常に終了しました\n")
 	return c.JSON(http.StatusOK, user)
@@ -238,12 +244,17 @@ func SetIcon(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusBadRequest, "ファイルをioに変換できませんでした")
 	}
 	defer src.Close()
-	prevDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
+	saveDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "フォルダパスを取得できませんでした")
 	}
-	defer os.Chdir(prevDir) //もとに戻る
+	defer os.Chdir(saveDir) //もとに戻る
 	if err := os.Chdir("img"); err != nil {
+		nowDir, err := os.Getwd()
+		if err != nil {
+			fmt.Printf("現在のディレクトリを取得できませんでした\n")
+		}
+		fmt.Printf("現在のディレクトリは:%v\n", nowDir)
 		return c.JSON(http.StatusBadRequest, "フォルダを移動できませんでした")
 	}
 	iconModel := strings.Split(icon.Filename, ".")

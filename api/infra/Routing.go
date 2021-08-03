@@ -7,11 +7,6 @@ import (
 )
 
 func Routing(e *echo.Echo) {
-	e.GET("/icon", func(c echo.Context) error {
-		ReadCookieReturnIcon(c, GetDB())
-		fmt.Printf("ReadCookie.return.icon\n")
-		return nil
-	})
 	e.GET("/user", func(c echo.Context) error {
 		ReadCookieReturnUser(c, GetDB())
 		fmt.Printf("ReadCookie.return.user\n")
