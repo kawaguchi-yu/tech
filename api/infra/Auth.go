@@ -40,7 +40,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func ReadCookie(c echo.Context) (string, error) {
+func ReadCookieReturnEMail(c echo.Context) (string, error) {
 	cookie, err := c.Cookie("jwt")
 	if err != nil {
 		fmt.Printf("クッキーを読み込めませんでした%v\n", cookie)

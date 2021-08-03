@@ -5,19 +5,17 @@ import {
 	chakra,
 	Flex,
 	Box,
-	FormControl,
-	FormLabel,
 	Input,
-	Checkbox,
 	Stack,
 	Button,
 	Heading,
+	FormControl,
 	useColorModeValue,
-	FormHelperText,
 } from '@chakra-ui/react';
+import router from "next/router";
 type LoginData = {
-	EMail: string;
-	Password: string;
+	EMail: string
+	Password: string
 }
 const userData: LoginData = {
 	EMail: "",
@@ -27,7 +25,7 @@ const Login = (): JSX.Element => {
 	const { register, handleSubmit, formState, formState: { errors }, getValues } = useForm<LoginData>({
 		mode: "onTouched"
 	});
-	const [posts, setPosts] = useState([]);
+	const [posts, setPosts] = useState<string>();
 
 	const setData = () => {
 		const hasData = getValues(["EMail", "Password"]);
@@ -47,10 +45,16 @@ const Login = (): JSX.Element => {
 		})
 			.then((res) => res.json())
 			.then((data) => {
-				setPosts(data);
+				if(data=="メールアドレスが存在しませんでした"){
+				setPosts(data)
+					console.log(data)
+			}else if(data=="パスワードが違います"){
+				setPosts(data)
+				console.log(data)
+			}else{
+				router.back()
+			}
 			})
-			.catch((err) => { console.log(err) })
-
 	};
 
 	return (
@@ -115,7 +119,7 @@ const Login = (): JSX.Element => {
 										disabled={!formState.isValid}>
 										ログイン
 									</Button>
-									<Heading>{JSON.stringify(posts)}</Heading>
+									<Heading>{posts != "" && <>{JSON.stringify(posts)}</>}</Heading>
 								</Stack>
 							</Stack>
 						</Box>

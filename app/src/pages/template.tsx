@@ -11,9 +11,10 @@ import {
 	Heading,
 	Image,
 } from '@chakra-ui/react';
-import Link from './components/Link';
+import Link from "./components/Link"
+import { useRouter } from 'next/router'
 import React, { useState, useEffect } from "react"
-type dataStruct = {
+type user = {
 	ID: string
 	CreatedAt: string
 	UpdatedAt: string
@@ -21,63 +22,51 @@ type dataStruct = {
 	Name: string
 	EMail: string
 	Password: string
-	Posts: string
 	Profile: string
 	ProfileID: string
 	Goods: string
+	Icon: string
+	IconBlob: Blob
 };
-var returnData: dataStruct = {
-	ID: "",
-	CreatedAt: "",
-	UpdatedAt: "",
-	DeletedAt: "",
-	Name: "",
-	EMail: "",
-	Password: "",
-	Posts: "",
-	Profile: "",
-	ProfileID: "",
-	Goods: "",
-}
-const MyPagesTemplate = () => {
-
+const Template = () => {
+	const router = useRouter()
 	useEffect(() => {
-		const options: RequestInit = {
-			mode: "cors",
-			method: "GET",
-			credentials: 'include',
-		}
 		fetch("http://localhost:8080/user", {
 			mode: "cors",
 			method: "GET",
-			headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
 			credentials: 'include',
 		}).then((res) => res.json())
 			.then((data) => {
-				const result = JSON.stringify(data)
-				const result2: dataStruct = JSON.parse(result)
-				returnData = result2
-				setUser(returnData)
-				if (returnData == null) {
-					console.log("データはないよ！", returnData)
+				const userData: user = data
+				if (userData == null) {
+					console.log("データはないよ！", userData)
 				} else {
-					setHasCookie(true)
-					console.log("データはあるよ！", returnData)
+					console.log("ユーザーデータ", userData.Icon)
+					let bin = atob(userData.Icon.replace(/^.*,/, ''));
+					let buffer = new Uint8Array(bin.length);
+					for (let i = 0; i < bin.length; i++) {
+						buffer[i] = bin.charCodeAt(i);
+					} let blob = new Blob([buffer.buffer], {
+						type: "image/jpeg"
+					});
+					userData.IconBlob = blob
+					setUser(userData)
 				}
+			}).catch(() => {
+				console.error("データを貰ってくることができませんでした")
 			})
-		fetch("http://localhost:8080/icon", {
+	}, [])
+	const Logout = () => {
+		fetch("http://localhost:8080/logout", {
 			mode: "cors",
 			method: "GET",
 			credentials: 'include',
-		}).then((res) => res.blob())
-			.then((data) => {
-				setIcon(data);
-				console.log("データ", data)
+		}).then((res) => res.json())
+			.then(() => {
+				router.reload()
 			})
-	}, [])
-	const [user, setUser] = useState<dataStruct>(returnData);
-	const [icon, setIcon] = useState<Blob>()
-	const [hasCookie, setHasCookie] = useState<boolean>(false);
+	}
+	const [user, setUser] = useState<user>();
 	return (
 		<>
 			<Flex bg={useColorModeValue('gray.100', 'gray.900')} alignItems={'center'}>
@@ -89,20 +78,22 @@ const MyPagesTemplate = () => {
 				<Spacer />
 				<Box mr={4}>
 					<Flex direction="row" align="center">
-						{hasCookie
+						{user
 							? <><Heading mr="4">welcome!{user.Name}</Heading>
 								<Spacer />
 								<Menu>
 									<MenuButton as={Button} h={16} p={2}>
-										{icon && <Image boxSize="50px"
+										{user.IconBlob && <Image boxSize="50px"
 											borderRadius="full"
-											src={(window.URL.createObjectURL(icon))}
+											src={(window.URL.createObjectURL(user.IconBlob))}
 											alt="select picture" />}
 									</MenuButton>
 									<MenuList>
+										<Link href={`/${user.Name}`}><MenuItem>マイページ</MenuItem></Link>
+										<Link href="/post"><MenuItem>クイズを投稿する</MenuItem></Link>
 										<Link href="/config"><MenuItem>設定</MenuItem></Link>
 										<Link href="/terms"><MenuItem>利用規約</MenuItem></Link>
-										<MenuItem>ログアウト</MenuItem>
+										<MenuItem onClick={Logout}>ログアウト</MenuItem>
 									</MenuList>
 								</Menu>
 							</>
@@ -125,4 +116,4 @@ const MyPagesTemplate = () => {
 		</>
 	);
 }
-export default MyPagesTemplate
+export default Template
