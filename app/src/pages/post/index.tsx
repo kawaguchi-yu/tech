@@ -92,7 +92,6 @@ const Posts = () => {
 			/>
 			{errors.title && errors.title.message}
 		</FormControl>
-		<HStack>
 			<FormControl onSubmit={handleSubmit(setData)}
 				isInvalid={errors.answer ? true : false}>
 				<FormLabel>正答</FormLabel>
@@ -144,7 +143,6 @@ const Posts = () => {
 				/>
 				{errors.wrongAnswer3 && errors.wrongAnswer3.message}
 			</FormControl>
-		</HStack>
 		<Stack>
 			<FormControl onSubmit={handleSubmit(setData)}
 				isInvalid={errors.explanation ? true : false}>
@@ -175,11 +173,11 @@ const Posts = () => {
 			<Button onClick={getAnswer} value={randomAnswer[1]}>回答2:{randomAnswer[1]}</Button>
 			<Button onClick={getAnswer} value={randomAnswer[2]}>回答3:{randomAnswer[2]}</Button>
 			<Button onClick={getAnswer} value={randomAnswer[3]}>回答4:{randomAnswer[3]}</Button>
-			<Stack>
+		</HStack>
+		<Stack>
 				<>{answer}</>
 				{answer && <>正解は{quizData.answer}です</>}
 			</Stack>
-		</HStack>
 		<Stack>
 			{answer && <>解説文{quizData.explanation}</>}
 		</Stack>

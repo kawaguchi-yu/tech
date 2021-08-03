@@ -13,12 +13,20 @@ import { useRouter } from 'next/router'
 type quizType = {
 	ID: number
 	UserID: number
-	title: string|string[]
-	answer: string|string[]
-	wrongAnswer1: string|string[]
-	wrongAnswer2: string|string[]
-	wrongAnswer3: string|string[]
-	explanation: string|string[]
+	title: string | string[]
+	answer: string | string[]
+	wrongAnswer1: string | string[]
+	wrongAnswer2: string | string[]
+	wrongAnswer3: string | string[]
+	explanation: string | string[]
+	Tags: tag[]
+	Goods: good[]
+}
+type tag = {
+	Name: string
+}
+type good = {
+	ID: number
 }
 const quizData: quizType = {
 	ID: null,
@@ -29,6 +37,8 @@ const quizData: quizType = {
 	wrongAnswer2: "",
 	wrongAnswer3: "",
 	explanation: "",
+	Tags: null,
+	Goods: null,
 }
 const Posts = () => {
 	const { register, handleSubmit, formState, formState: { errors }, getValues } = useForm({
@@ -37,7 +47,7 @@ const Posts = () => {
 	const [posts, setPosts] = useState([])
 	const [randomAnswer, setRandomAnswer] = useState([])
 	const [answer, setAnswer] = useState<string>()
-  const router = useRouter();
+	const router = useRouter();
 	const setData = () => {
 		const hasData = getValues(["title", "answer", "wrongAnswer1", "wrongAnswer2", "wrongAnswer3", "explanation"])
 		quizData.ID = Number(router.query.ID)
@@ -94,7 +104,7 @@ const Posts = () => {
 			<FormLabel>問題文</FormLabel>
 			<Input
 				type="string"
-        defaultValue={router.query.Title}
+				defaultValue={router.query.Title}
 				placeholder="例:この中でフロントエンド言語はどれ？"
 				{...register("title", {
 					required: "タイトルを入力してください",
@@ -102,13 +112,12 @@ const Posts = () => {
 			/>
 			{errors.title && errors.title.message}
 		</FormControl>
-		<HStack>
 			<FormControl onSubmit={handleSubmit(setData)}
 				isInvalid={errors.answer ? true : false}>
 				<FormLabel>正答</FormLabel>
 				<Input
 					type="body"
-          defaultValue={router.query.Answer}
+					defaultValue={router.query.Answer}
 					placeholder="例:JavaScript"
 					{...register("answer", {
 						required: "回答を入力してください",
@@ -116,13 +125,12 @@ const Posts = () => {
 				/>
 				{errors.answer && errors.answer.message}
 			</FormControl>
-
 			<FormControl onSubmit={handleSubmit(setData)}
 				isInvalid={errors.wrongAnswer1 ? true : false}>
 				<FormLabel>誤答</FormLabel>
 				<Input
 					type="body"
-          defaultValue={router.query.WrongAnswer1}
+					defaultValue={router.query.WrongAnswer1}
 					placeholder="例:Go"
 					{...register("wrongAnswer1", {
 						required: "回答を入力してください",
@@ -136,7 +144,7 @@ const Posts = () => {
 				<FormLabel>誤答</FormLabel>
 				<Input
 					type="body"
-          defaultValue={router.query.WrongAnswer2}
+					defaultValue={router.query.WrongAnswer2}
 					placeholder="例:PHP"
 					{...register("wrongAnswer2", {
 						required: "回答を入力してください",
@@ -150,7 +158,7 @@ const Posts = () => {
 				<FormLabel>誤答</FormLabel>
 				<Input
 					type="body"
-          defaultValue={router.query.WrongAnswer3}
+					defaultValue={router.query.WrongAnswer3}
 					placeholder="例:Ruby"
 					{...register("wrongAnswer3", {
 						required: "回答を入力してください",
@@ -158,14 +166,13 @@ const Posts = () => {
 				/>
 				{errors.wrongAnswer3 && errors.wrongAnswer3.message}
 			</FormControl>
-		</HStack>
 		<Stack>
 			<FormControl onSubmit={handleSubmit(setData)}
 				isInvalid={errors.explanation ? true : false}>
 				<FormLabel>解説文</FormLabel>
 				<Input
 					type="body"
-          defaultValue={router.query.Explanation}
+					defaultValue={router.query.Explanation}
 					placeholder="JavaScriptだけがフロントエンド言語だよ！"
 					{...register("explanation", {
 						required: "解説文を入力してください",
@@ -190,13 +197,14 @@ const Posts = () => {
 			<Button onClick={getAnswer} value={randomAnswer[1]}>回答2:{randomAnswer[1]}</Button>
 			<Button onClick={getAnswer} value={randomAnswer[2]}>回答3:{randomAnswer[2]}</Button>
 			<Button onClick={getAnswer} value={randomAnswer[3]}>回答4:{randomAnswer[3]}</Button>
-			<Stack>
+			
+		</HStack>
+		<Stack>
 				<>{answer}</>
 				{answer && <>正解は{quizData.answer}です</>}
 			</Stack>
-		</HStack>
 		<Stack>
-			{answer && <>解説文{quizData.explanation}</>}
+			{answer && <>解説文 {quizData.explanation}</>}
 		</Stack>
 		{JSON.stringify(posts)}
 	</>)

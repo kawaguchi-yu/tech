@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -67,11 +66,12 @@ func DBCreateUser(c echo.Context, db *gorm.DB) error { //渡された値をDBに
 	}
 	u.Password = string(hashedPassword)
 	fmt.Printf("%+v\n", u)
+	u.Icon = ("dog_out.png")
 	result := db.Create(&u)
 	if result.Error != nil {
-		return c.JSON(http.StatusBadRequest, "メールアドレスが重複しています")
+		return c.JSON(http.StatusBadRequest, "名前かメールアドレスが重複しています")
 	}
-	return c.JSON(http.StatusOK, "name:"+u.Name+", email:"+u.EMail+", password:"+u.Password)
+	return c.JSON(http.StatusOK, "ユーザー登録完了！")
 }
 
 func Login(c echo.Context, db *gorm.DB) error { //emailとpasswordでjwt入りcookie貰える
@@ -105,19 +105,7 @@ func Logout(c echo.Context, db *gorm.DB) error { //emailとpasswordでjwt入りc
 }
 
 func getIcon(userIcon string) string {
-	saveDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
-	if err != nil {
-		return "error"
-	}
-	defer os.Chdir(saveDir) //もとに戻る
-	if err := os.Chdir("img"); err != nil {
-		nowDir, err := os.Getwd()
-		if err != nil {
-			fmt.Printf("現在のディレクトリを取得できませんでした\n")
-		}
-		fmt.Printf("現在のディレクトリは:%v\n", nowDir)
-		return "error"
-	}
+	os.Chdir("img")
 	file, err := os.Open(userIcon)
 	if err != nil {
 		fmt.Printf("データを開けませんでした\n")
@@ -136,11 +124,6 @@ func getIcon(userIcon string) string {
 	return userIcon
 }
 func ReadCookieReturnUser(c echo.Context, db *gorm.DB) error {
-	nowDir, err := os.Getwd()
-	if err != nil {
-		fmt.Printf("現在のディレクトリを取得できませんでした\n")
-	}
-	fmt.Printf("現在のディレクトリは:%v\n", nowDir)
 	email, err := ReadCookieReturnEMail(c)
 	if err != nil {
 		fmt.Printf("クッキー読み取りに失敗しました\n")
@@ -148,33 +131,23 @@ func ReadCookieReturnUser(c echo.Context, db *gorm.DB) error {
 	}
 	var user domain.User
 	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, nil)
+		fmt.Printf("emailが存在しませんでした\n")
+		return c.JSON(http.StatusBadRequest, "emailが存在しませんでした")
 	}
 	user.Icon = getIcon(user.Icon)
 	if user.Icon == "error" {
-		return c.JSON(http.StatusOK, "base64エンコードに失敗しました")
+		return c.JSON(http.StatusBadRequest, "base64エンコードに失敗しました")
 	}
+	fmt.Printf("user.Name=%v\n", user.Name)
 	return c.JSON(http.StatusOK, user)
 }
 func ReturnAllUserPost(c echo.Context, db *gorm.DB) error { //全user情報を渡す
+	os.Chdir("img")
 	var users []domain.User
 	db.Find(&users)
 	var posts []domain.Post
 	db.Find(&posts)
 	var returnUsers []domain.User
-	saveDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "フォルダパスを取得できませんでした")
-	}
-	defer os.Chdir(saveDir) //もとに戻る
-	if err := os.Chdir("img"); err != nil {
-		nowDir, err := os.Getwd()
-		if err != nil {
-			fmt.Printf("現在のディレクトリを取得できませんでした\n")
-		}
-		fmt.Printf("現在のディレクトリは:%v\n", nowDir)
-		return c.JSON(http.StatusBadRequest, "フォルダを移動できませんでした")
-	}
 	for _, user := range users {
 		for _, post := range posts {
 			if post.UserID == user.ID {
@@ -185,14 +158,13 @@ func ReturnAllUserPost(c echo.Context, db *gorm.DB) error { //全user情報を�
 			fmt.Printf("userIcon=%vuserName=%v\n", user.Icon, user.Name)
 			file, err := os.Open(user.Icon)
 			if err != nil {
-				fmt.Printf("データを開けませんでした\n")
-				return c.JSON(http.StatusOK, "データを開けませんでした")
+				return c.JSON(http.StatusBadRequest, "データを開けませんでした")
 			}
 			defer file.Close()
 			fi, err := file.Stat() //FileInfo interface
 			if err != nil {
 				fmt.Printf("データ取得に失敗しました\n")
-				return c.JSON(http.StatusOK, "データ取得に失敗しました")
+				return c.JSON(http.StatusBadRequest, "データ取得に失敗しました")
 			}
 			size := fi.Size() //ファイルサイズ
 			data := make([]byte, size)
@@ -203,7 +175,6 @@ func ReturnAllUserPost(c echo.Context, db *gorm.DB) error { //全user情報を�
 			returnUsers = append(returnUsers, user)
 		}
 	}
-
 	fmt.Printf("ReturnAllUserは正常に終了しました\n")
 	return c.JSON(http.StatusOK, returnUsers)
 }
@@ -244,19 +215,7 @@ func SetIcon(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusBadRequest, "ファイルをioに変換できませんでした")
 	}
 	defer src.Close()
-	saveDir, err := filepath.Abs(".") //カレントディレクトリのパスを保存
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "フォルダパスを取得できませんでした")
-	}
-	defer os.Chdir(saveDir) //もとに戻る
-	if err := os.Chdir("img"); err != nil {
-		nowDir, err := os.Getwd()
-		if err != nil {
-			fmt.Printf("現在のディレクトリを取得できませんでした\n")
-		}
-		fmt.Printf("現在のディレクトリは:%v\n", nowDir)
-		return c.JSON(http.StatusBadRequest, "フォルダを移動できませんでした")
-	}
+	os.Chdir("img")
 	iconModel := strings.Split(icon.Filename, ".")
 	iconName := iconModel[0]
 	extension := iconModel[1]
