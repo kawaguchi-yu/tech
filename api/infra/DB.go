@@ -73,7 +73,24 @@ func DBCreateUser(c echo.Context, db *gorm.DB) error { //渡された値をDBに
 	}
 	return c.JSON(http.StatusOK, "ユーザー登録完了！")
 }
-
+func DeleteUser(c echo.Context, db *gorm.DB) error {
+	email, err := ReadCookieReturnEMail(c) //クッキーからemailを読み取る
+	if err != nil {
+		fmt.Printf("ユーザーの削除権限がありません\n")
+		return c.JSON(http.StatusBadRequest, "ユーザーの削除権限がありません")
+	}
+	user := new(domain.User)
+	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
+		return c.JSON(http.StatusBadRequest, "db接続に失敗しました\n")
+	} //dbから現在のユーザーデータを取得する
+	db.Delete(&domain.User{}, user.ID)
+	posts := new(domain.Post)
+	db.Where("user_id = ?", user.ID).Find(&posts)
+	fmt.Printf("%v\n", posts)
+	db.Delete(&domain.Post{}, posts.ID)
+	fmt.Printf("userから%vIDを削除しました\n", user.ID)
+	return c.JSON(http.StatusOK, "ユーザーを削除しました。")
+}
 func Login(c echo.Context, db *gorm.DB) error { //emailとpasswordでjwt入りcookie貰える
 	u := new(domain.User)
 	c.Bind(u)

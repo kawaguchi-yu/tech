@@ -12,6 +12,11 @@ func Routing(e *echo.Echo) {
 		fmt.Printf("ReadCookie.return.user\n")
 		return nil
 	})
+	e.GET("/deleteuser", func(c echo.Context) error {
+		DeleteUser(c, GetDB())
+		fmt.Printf("return.deleteuser\n")
+		return nil
+	})
 	e.GET("/getalluserpost", func(c echo.Context) error {
 		ReturnAllUserPost(c, GetDB())
 		fmt.Printf("return.getalluserpost\n")
