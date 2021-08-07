@@ -41,7 +41,6 @@ const Template = () => {
 				if (userData == null) {
 					console.log("データはないよ！", userData)
 				} else {
-					console.log("ユーザーデータ", userData.Icon)
 					let bin = atob(userData.Icon.replace(/^.*,/, ''));
 					let buffer = new Uint8Array(bin.length);
 					for (let i = 0; i < bin.length; i++) {

@@ -44,9 +44,11 @@ type URLPath = {
 	Name: string
 }
 const MyPages = (): JSX.Element => {
-	const [postDatas, setPostDatas] = useState<post[]>([])
-	const [URLQuery, setURLQuery] = useState<URLPath>()
+
 	const router = useRouter()
+	const [URLQuery, setURLQuery] = useState<URLPath>()
+	const [postDatas, setPostDatas] = useState<post[]>([])
+	const [userData,setUserData] = useState<user>()
 	useEffect(() => {
 		if (router.asPath !== router.route) {//厳密不等価
 			const queryname: URLPath = { Name: String(router.query.name)}
@@ -75,9 +77,9 @@ const MyPages = (): JSX.Element => {
 				userData.Posts.forEach(postData =>
 					{postData.Name = userData.Name
 						postData.Icon = blob
-					setPostDatas(postDatas => [...postDatas, postData]),
-					console.log("貰ってきたデータ", datas)
 					})
+					console.log("貰ってきたデータ", datas)
+					setPostDatas(userData.Posts)
 			})
 			.catch(() => {
 				console.error("データを貰ってくることができませんでした")
@@ -104,24 +106,22 @@ const MyPages = (): JSX.Element => {
 					Goods: postData.Goods,
 				}
 				return (
-					<VStack key={userInfo.ID} padding="10" border="solid 1px">
+					<VStack key={postData.ID} padding="10" border="solid 1px">
 						<Image boxSize="50px"
 							borderRadius="full"
 							src={(window.URL.createObjectURL(postData.Icon))}
 							alt="select picture" />
-						<Box>{userInfo.Name}が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
+						<Box>{postData.Name}が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
 						<Link
-							as={`/items/${userInfo.ID}`}
+							as={`/items/${postData.ID}`}
 							href={{ pathname: `/items/[ID]`, query: userInfo }}
 							passHref>
-							<Box>{userInfo.Title}</Box>
+							<Box>{postData.Title}</Box>
 						</Link>
 					</VStack>
 				)
 			})}
-
 		</>)
-
 	}
 	return (
 		<>
