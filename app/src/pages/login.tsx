@@ -55,6 +55,9 @@ const Login = (): JSX.Element => {
 				router.back()
 			}
 			})
+			.catch((err) => 
+				console.log(err)
+			)
 	};
 
 	return (

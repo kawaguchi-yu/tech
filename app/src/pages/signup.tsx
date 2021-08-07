@@ -47,13 +47,15 @@ const View = () => {
     fetch("http://localhost:8080/signup", {
       mode: "cors",
       method: "POST",
+      credentials: 'include',
       headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
       body: JSON.stringify(userData),
     })
       .then((res) => res.json())
       .then((data) => {
         setPosts(data);
-      });
+      })
+      .catch((err) => { console.log(err) })
   };
 
   return (

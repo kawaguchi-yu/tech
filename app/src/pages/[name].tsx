@@ -44,9 +44,9 @@ type URLPath = {
 	Name: string
 }
 const MyPages = (): JSX.Element => {
-
-	const router = useRouter()
+	const [postDatas, setPostDatas] = useState<post[]>([])
 	const [URLQuery, setURLQuery] = useState<URLPath>()
+	const router = useRouter()
 	useEffect(() => {
 		if (router.asPath !== router.route) {//厳密不等価
 			const queryname: URLPath = { Name: String(router.query.name)}
@@ -84,7 +84,6 @@ const MyPages = (): JSX.Element => {
 			})
 		}
 	}, [URLQuery])
-	const [postDatas, setPostDatas] = useState<post[]>([])
 	const PostsView = () => {
 		return (<>
 			{postDatas.map((postData) => {
@@ -110,7 +109,7 @@ const MyPages = (): JSX.Element => {
 							borderRadius="full"
 							src={(window.URL.createObjectURL(postData.Icon))}
 							alt="select picture" />
-						<Box>{router.query.name}が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
+						<Box>{userInfo.Name}が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
 						<Link
 							as={`/items/${userInfo.ID}`}
 							href={{ pathname: `/items/[ID]`, query: userInfo }}
