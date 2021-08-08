@@ -9,6 +9,10 @@ import (
 
 func Routing(e *echo.Echo) {
 	userController := controllers.NewUserController(DBInit())
+	e.POST("/updateuser", func(c echo.Context) error {
+		fmt.Printf("/updateuser\n")
+		return userController.UpdateUser(c)
+	})
 	e.POST("/seticon", func(c echo.Context) error {
 		fmt.Printf("/seticon\n")
 		return userController.SetIcon(c)
@@ -41,10 +45,14 @@ func Routing(e *echo.Echo) {
 		fmt.Printf("/user\n")
 		return userController.ReadCookieReturnUser(c)
 	})
+	e.GET("/guestlogin", func(c echo.Context) error {
+		fmt.Printf("/guestlogin\n")
+		return userController.GuestLogin(c)
+	})
 	e.POST("/login", func(c echo.Context) error {
 		fmt.Printf("/login\n")
 		return userController.Login(c)
-	}) //user.structのデータを貰って登録する
+	})
 	e.POST("/signup", func(c echo.Context) error {
 		fmt.Printf("/signup\n")
 		return userController.CreateUser(c)

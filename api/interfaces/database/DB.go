@@ -42,11 +42,23 @@ func (db *UserRepository) DeletePost(email string, post domain.Post) error {
 	}
 	return nil
 }
+func (db *UserRepository) GuestLogin() (u domain.User, err error) {
+	var user domain.User
+	if err := db.First(&user, "name = ?", "Guest User").Error; err != nil {
+		fmt.Printf("ゲストログインに失敗しました\n")
+		return user, err
+	}
+	return user, nil
+}
 func (db *UserRepository) ReturnUserBYEMail(email string) (u domain.User, err error) {
 	var user domain.User
 	if err := db.First(&user, "e_mail = ?", email).Error; err != nil {
 		fmt.Printf("メールアドレスが存在しませんでした\n")
 		return user, err
+	}
+	if err := db.First(&user.Profile, "user_id = ?", user.ID).Error; err != nil {
+		fmt.Printf("profileがありませんでした\n")
+		return user, nil
 	}
 	return user, nil
 }
@@ -112,6 +124,31 @@ func (db *UserRepository) SetIcon(email string, IconPath string) (err error) {
 	}
 	if err := db.Model(&user).Update("icon", IconPath).Error; err != nil {
 		return err
+	}
+	return nil
+}
+func (db *UserRepository) UpdateUser(email string, u domain.User) (err error) {
+	user := new(domain.User)
+	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
+		return err
+	}
+	if u.Name != "" {
+		user.Name = u.Name
+		if err := db.Model(&user).Update("Name", u.Name).Error; err != nil {
+			return err
+		}
+	}
+	profile := new(domain.Profile)
+	profile = &u.Profile
+	fmt.Printf("%v\n", profile)
+	if profile.ID == 0 {
+		if err := db.Create(&profile).Error; err != nil {
+			return err
+		}
+	} else {
+		if err := db.Where("id = ?", profile.ID).Updates(&profile).Error; err != nil {
+			return err
+		}
 	}
 	return nil
 }

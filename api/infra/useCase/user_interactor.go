@@ -36,11 +36,19 @@ func (interactor *UserInteractor) CreatePost(email string, post domain.Post) (er
 	err = interactor.UserRepository.CreatePost(email, post)
 	return
 }
+func (interactor *UserInteractor) GuestLogin() (user domain.User, err error) {
+	user, err = interactor.UserRepository.GuestLogin()
+	return
+}
 func (interactor *UserInteractor) DeletePost(email string, post domain.Post) (err error) {
 	err = interactor.UserRepository.DeletePost(email, post)
 	return
 }
 func (interactor *UserInteractor) UpdatePost(email string, post *domain.Post) (err error) {
 	err = interactor.UserRepository.UpdatePost(email, post)
+	return
+}
+func (interactor *UserInteractor) UpdateUser(email string, u domain.User) (err error) {
+	err = interactor.UserRepository.UpdateUser(email, u)
 	return
 }

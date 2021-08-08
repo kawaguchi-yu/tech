@@ -74,10 +74,14 @@ const View = () => {
               minLength: {
                 value: 0,
                 message: '名前を入力してください' // JS only: <p>error message</p> TS only support string
+              },
+              maxLength: {
+                value: 15,
+                message: '15文字以内で入力してください' // JS only: <p>error message</p> TS only support string
               }
             })}
           />
-          {errors.Name && "名前を入力してください"}
+          {errors.Name && errors.Name.message}
         </FormControl>
 
         <FormControl onSubmit={handleSubmit(setData)}

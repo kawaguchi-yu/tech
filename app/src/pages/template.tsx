@@ -30,6 +30,7 @@ type user = {
 };
 const Template = () => {
 	const router = useRouter()
+	const [user, setUser] = useState<user>();
 	useEffect(() => {
 		fetch("http://localhost:8080/user", {
 			mode: "cors",
@@ -55,6 +56,16 @@ const Template = () => {
 				console.error("データを貰ってくることができませんでした")
 			})
 	}, [])
+	const GuestLogin = () =>{
+		fetch("http://localhost:8080/guestlogin", {
+			mode: "cors",
+			method: "GET",
+			credentials: 'include',
+		}).then((res) => res.json())
+			.then(() => {
+				router.reload()
+			})
+	}
 	const Logout = () => {
 		fetch("http://localhost:8080/logout", {
 			mode: "cors",
@@ -65,7 +76,6 @@ const Template = () => {
 				router.reload()
 			})
 	}
-	const [user, setUser] = useState<user>();
 	return (
 		<>
 			<Flex bg={useColorModeValue('gray.100', 'gray.900')} alignItems={'center'}>
@@ -97,8 +107,11 @@ const Template = () => {
 								</Menu>
 							</>
 							: <>
+							<Button　mr="4" colorScheme="linkedin" onClick={GuestLogin}>
+								ゲストログイン
+							</Button>
 								<Link href="/signup">
-									<Button mr="4" colorScheme="teal" variant="solid">
+									<Button mr="4" colorScheme="teal">
 										ユーザー登録
 									</Button>
 								</Link>

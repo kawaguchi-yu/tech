@@ -42,8 +42,7 @@ func (controller *UserController) CreateUser(c Context) (err error) {
 	u.Icon = ("dog_out.png")
 	err = controller.Interactor.Add(u)
 	if err != nil {
-		c.JSON(500, "Add失敗")
-		return
+		return c.JSON(500, "Add失敗")
 	}
 	claims := jwt.StandardClaims{
 		Issuer:    u.EMail,
@@ -63,6 +62,26 @@ func (controller *UserController) CreateUser(c Context) (err error) {
 	c.SetCookie(cookie)
 	c.JSON(201, "Add成功！")
 	return
+}
+func (controller *UserController) UpdateUser(c Context) (err error) {
+	u := domain.User{}
+	if err := c.Bind(&u); err != nil {
+		fmt.Printf("Contextからuserを読めませんでした\n")
+		c.JSON(http.StatusBadRequest, "Contextからuserを読めませんでした")
+	}
+	fmt.Printf("user=%v\n", u)
+	email, err := ReadCookieReturnEMail(c)
+	if err != nil {
+		fmt.Printf("Contextからemailを読めませんでした\n")
+		c.JSON(http.StatusBadRequest, "Contextからemailを読めませんでした")
+	}
+	err = controller.Interactor.UpdateUser(email, u)
+	if err != nil {
+		fmt.Printf("Contextからemailを読めませんでした\n")
+		c.JSON(http.StatusBadRequest, "updateできませんでした")
+	}
+	fmt.Printf("正常に終了しました\n")
+	return c.JSON(http.StatusOK, "正常に終了しました")
 }
 func (controller *UserController) SetIcon(c Context) (err error) {
 	icon, err := c.FormFile("file")
@@ -175,12 +194,36 @@ func (controller *UserController) DeleteUser(c Context) (err error) {
 	c.JSON(201, "Delete成功！")
 	return
 }
+func (controller *UserController) GuestLogin(c Context) (err error) {
+	user, err := controller.Interactor.GuestLogin()
+	if err != nil {
+		fmt.Printf("メールアドレスが存在しませんでした\n")
+		return c.JSON(http.StatusBadRequest, "メールアドレスが存在しませんでした")
+	}
+	claims := jwt.StandardClaims{
+		Issuer:    user.EMail,
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // 有効期限
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte("kirikiri")) //電子署名
+	if err != nil {
+		panic("電子署名できませんでした")
+	}
+	cookie := new(http.Cookie)
+	cookie.Name = "jwt"
+	cookie.Value = tokenString
+	cookie.Expires = time.Now().Add(10 * time.Hour)
+	cookie.Path = "/"
+	cookie.HttpOnly = true
+	c.SetCookie(cookie)
+	return c.JSON(http.StatusOK, cookie)
+}
 func (controller *UserController) Login(c Context) (err error) {
 	u := new(domain.User)
 	c.Bind(u)
 	user, err := controller.Interactor.ReturnUserBYEMail(u.EMail)
 	if err != nil {
-		fmt.Printf("http.badreq\n")
+		fmt.Printf("メールアドレスが存在しませんでした\n")
 		return c.JSON(http.StatusBadRequest, "メールアドレスが存在しませんでした")
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(u.Password)); err != nil {

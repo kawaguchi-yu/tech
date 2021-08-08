@@ -5,6 +5,7 @@ import {
 	Stack,
 	Box,
 	VStack,
+	HStack,
 	Image,
 } from '@chakra-ui/react';
 import Link from "next/link";
@@ -48,10 +49,9 @@ const MyPages = (): JSX.Element => {
 	const router = useRouter()
 	const [URLQuery, setURLQuery] = useState<URLPath>()
 	const [postDatas, setPostDatas] = useState<post[]>([])
-	const [userData,setUserData] = useState<user>()
 	useEffect(() => {
 		if (router.asPath !== router.route) {//厳密不等価
-			const queryname: URLPath = { Name: String(router.query.name)}
+			const queryname: URLPath = { Name: String(router.query.name) }
 			setURLQuery(queryname);
 		}
 	}, [router])
@@ -64,26 +64,26 @@ const MyPages = (): JSX.Element => {
 				credentials: 'include',//bodyの代わりにcookieを送る
 				body: JSON.stringify(URLQuery)
 			})
-			.then((res) => res.json())
-			.then((datas) => {
-				const userData: user = datas
-				let bin = atob(userData.Icon.replace(/^.*,/, ''));
+				.then((res) => res.json())
+				.then((datas) => {
+					const userData: user = datas
+					let bin = atob(userData.Icon.replace(/^.*,/, ''));
 					let buffer = new Uint8Array(bin.length);
 					for (let i = 0; i < bin.length; i++) {
 						buffer[i] = bin.charCodeAt(i);
 					} let blob = new Blob([buffer.buffer], {
 						type: "image/jpeg"
 					});
-				userData.Posts.forEach(postData =>
-					{postData.Name = userData.Name
+					userData.Posts.forEach(postData => {
+						postData.Name = userData.Name
 						postData.Icon = blob
 					})
 					console.log("貰ってきたデータ", datas)
 					setPostDatas(userData.Posts)
-			})
-			.catch(() => {
-				console.error("データを貰ってくることができませんでした")
-			})
+				})
+				.catch(() => {
+					console.error("データを貰ってくることができませんでした")
+				})
 		}
 	}, [URLQuery])
 	const PostsView = () => {
@@ -127,7 +127,11 @@ const MyPages = (): JSX.Element => {
 		<>
 			<Template />
 			<chakra.div>
-				<Box align="center" p="10">投稿したクイズ一覧</Box>
+				<HStack align="center" p="10">
+					<Link href="/config">プロフィールを編集する</Link>
+					<Box>投稿したクイズ一覧</Box>
+					<Box>投稿したクイズ一覧</Box>
+				</HStack>
 				<Stack>
 					<VStack>
 						<PostsView />
