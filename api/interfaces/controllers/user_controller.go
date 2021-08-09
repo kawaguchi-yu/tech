@@ -3,8 +3,8 @@ package controllers
 import (
 	"fmt"
 	"hello/server/domain"
-	"hello/server/infra/useCase"
 	"hello/server/interfaces/database"
+	"hello/server/useCase"
 	"io"
 	"net/http"
 	"os"
@@ -28,7 +28,6 @@ func NewUserController(sqlHandler database.SqlHandler) *UserController {
 		},
 	}
 }
-
 func (controller *UserController) CreateUser(c Context) (err error) {
 	u := domain.User{}
 	c.Bind(&u)
@@ -69,6 +68,9 @@ func (controller *UserController) UpdateUser(c Context) (err error) {
 		fmt.Printf("Contextからuserを読めませんでした\n")
 		c.JSON(http.StatusBadRequest, "Contextからuserを読めませんでした")
 	}
+	if err := GuestUserCheck(u.ID); err != nil {
+		return c.JSON(http.StatusBadRequest, "GuestUserはユーザー情報を変更する権限がありません")
+	}
 	fmt.Printf("user=%v\n", u)
 	email, err := ReadCookieReturnEMail(c)
 	if err != nil {
@@ -89,6 +91,19 @@ func (controller *UserController) SetIcon(c Context) (err error) {
 		fmt.Printf("ファイルが読み込めません\n")
 		return c.JSON(http.StatusBadRequest, icon)
 	}
+	email, err := ReadCookieReturnEMail(c)
+	if err != nil {
+		fmt.Printf("クッキー読み取りに失敗しました\n")
+		return c.JSON(http.StatusBadRequest, "クッキー読み取りに失敗しました")
+	}
+	user := domain.User{}
+	user, err = controller.Interactor.ReturnUserBYEMail(email)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "emailからuserを取得できませんでした")
+	}
+	if err := GuestUserCheck(user.ID); err != nil {
+		return c.JSON(http.StatusBadRequest, "GuestUserは変更権限がありません")
+	}
 	src, err := icon.Open() //io.Readerに変換
 	if err != nil {
 		fmt.Printf("ファイルをioに変換できませんでした\n")
@@ -108,11 +123,6 @@ func (controller *UserController) SetIcon(c Context) (err error) {
 	if _, err = io.Copy(dst, src); err != nil { //ファイルの内容をコピー
 		fmt.Printf("コピーできませんでした\n")
 		return c.JSON(http.StatusBadRequest, "コピーできませんでした")
-	}
-	email, err := ReadCookieReturnEMail(c)
-	if err != nil {
-		fmt.Printf("クッキー読み取りに失敗しました\n")
-		return c.JSON(http.StatusBadRequest, "クッキー読み取りに失敗しました")
 	}
 	err = controller.Interactor.SetIcon(email, dst.Name())
 	if err != nil {
@@ -184,6 +194,14 @@ func (controller *UserController) DeleteUser(c Context) (err error) {
 	}
 	claims := token.Claims.(*Claims)
 	email := claims.Issuer
+	user := domain.User{}
+	user, err = controller.Interactor.ReturnUserBYEMail(email)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "emailからuserを取得できませんでした")
+	}
+	if err := GuestUserCheck(user.ID); err != nil {
+		return c.JSON(http.StatusBadRequest, "GuestUserは削除権限がありません")
+	}
 	err = controller.Interactor.DeleteAllByUserEMail(email)
 	if err != nil {
 		c.JSON(500, "Delete失敗")

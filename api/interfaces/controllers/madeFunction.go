@@ -2,12 +2,20 @@ package controllers
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"os"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
+func GuestUserCheck(userID uint) error {
+	const GuestUser = 30
+	if userID == GuestUser {
+		return errors.New("GuestUserはユーザー情報を変更する権限がありません")
+	}
+	return nil
+}
 func ReadCookieReturnEMail(c Context) (string, error) {
 	cookie, err := c.Cookie("jwt")
 	if err != nil {

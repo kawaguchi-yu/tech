@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import {
+	Box,
 	Button,
 	Input,
 	Image,
@@ -25,26 +26,27 @@ type user = {
 	IconBlob: Blob
 };
 type profile = {
-	ID:number
+	ID: number
 	UserID: number
 	Essay: string
 	URLs: URL[]
 }
-type URL ={
-	Name:string
-	URL:string
-	ProfileID:number
+type URL = {
+	Name: string
+	URL: string
+	ProfileID: number
 }
 const userForm: user = {
 	ID: 0,
 	Name: "",
 	EMail: "",
 	Password: "",
-	Profile: { ID:0,UserID: 0, Essay: "", URLs: [{Name:"",URL:"",ProfileID:0},{Name:"",URL:"",ProfileID:0}] },
-	ProfileID: null,
+	Profile: { ID: 0, UserID: 0, Essay: "", URLs: [{ Name: "", URL: "", ProfileID: 0 }, { Name: "", URL: "", ProfileID: 0 }] },
+	ProfileID: 0,
 	Icon: "",
 	IconBlob: null,
 }
+const guestuser: number = 30;
 const Config = () => {
 	const { register, handleSubmit, formState, formState: { errors }, getValues } = useForm({
 		mode: "onTouched",
@@ -65,7 +67,7 @@ const Config = () => {
 	const [view, setview] = useState<string>();
 	const [iconData, setIconData] = useState<FormData>();
 	const [posts, setPosts] = useState<Blob>();
-	const [user, setUser] = useState<user>();
+	const [user, setUser] = useState<user>(userForm);
 	useEffect(() => {
 		fetch("http://localhost:8080/user", {
 			mode: "cors",
@@ -123,7 +125,7 @@ const Config = () => {
 			body: JSON.stringify(userForm),
 		}).then((res) => res.json())
 			.then((data) => {
-				console.log("送られてきたデータ"+data)
+				console.log("送られてきたデータ" + data)
 			})
 			.catch((err) => { console.log(err) })
 	}
@@ -141,16 +143,17 @@ const Config = () => {
 	}
 	return (<>
 		<Template />
+		{user.ID == guestuser && <Box bgColor="aquamarine">ゲストユーザーはアカウント情報を更新できません。</Box>}
 		<Stack>
 			{view &&
 				<Image boxSize="300px" src={view} alt="select picture" />
 			}
 			<Stack>
-				<Input m="10" name="file" type='file' accept="image/*" onChange={onFileInputChange} />
+				<Input m="10" name="file" type='file' accept="image/*" onChange={onFileInputChange} disabled={user.ID == guestuser} />
 			</Stack>
 		</Stack>
 		<Stack>
-			<Button m="10" onClick={ApiFetch}>アイコンを変更する</Button>
+			<Button m="10" onClick={ApiFetch} disabled={user.ID == guestuser}>アイコンを変更する</Button>
 			{posts &&
 				<Image boxSize="300px" src={(window.URL.createObjectURL(posts))} alt="select picture" />
 			}
@@ -158,7 +161,7 @@ const Config = () => {
 		{user && <Stack>
 			<FormControl onSubmit={handleSubmit(setData)}>
 				<FormLabel>名前を変更する</FormLabel>
-				<Input defaultValue={user.Name} {...register("name")} />
+				<Input defaultValue={user.Name} {...register("name")} disabled={user.ID == guestuser} />
 			</FormControl>
 			<FormControl onSubmit={handleSubmit(setData)}>
 				<FormLabel>自己紹介</FormLabel>
@@ -167,32 +170,32 @@ const Config = () => {
 						value: /^[^^＾"”'’;； 　#$%<>`*]+$/,
 						message: '特殊文字は使えません' // JS only: <p>error message</p> TS only support string
 					}
-				})} />
+				})} disabled={user.ID == guestuser} />
 				{errors.essay && errors.essay.message}
 				<FormHelperText>200文字以内でお願いします</FormHelperText>
 			</FormControl>
 			{user.Profile.ID != 0 &&
-			<><FormControl onSubmit={handleSubmit(setData)}>
-				<FormLabel>Twitter URl</FormLabel>
-				<InputGroup>
-					<InputLeftAddon>https://twitter.com/</InputLeftAddon>
-					{user.Profile.URLs && <Input defaultValue={user.Profile.URLs[0].URL} {...register("url1")} />}
-					{!user.Profile.URLs && <Input {...register("url1")} />}
-				</InputGroup>
-			</FormControl>
-			<FormControl onSubmit={handleSubmit(setData)}>
-				<FormLabel>Github URl</FormLabel>
-				<InputGroup>
-					<InputLeftAddon>https://github.com/</InputLeftAddon>
-					{user.Profile.URLs && <Input defaultValue={user.Profile.URLs[1].URL} {...register("url2")} />}
-					{!user.Profile.URLs && <Input {...register("url2")} />}
-				</InputGroup>
-			</FormControl></>}
+				<><FormControl onSubmit={handleSubmit(setData)}>
+					<FormLabel>Twitter URl</FormLabel>
+					<InputGroup>
+						<InputLeftAddon>https://twitter.com/</InputLeftAddon>
+						{user.Profile.URLs && <Input defaultValue={user.Profile.URLs[0].URL} {...register("url1")} />}
+						{!user.Profile.URLs && <Input {...register("url1")} disabled={user.ID == guestuser} />}
+					</InputGroup>
+				</FormControl>
+					<FormControl onSubmit={handleSubmit(setData)}>
+						<FormLabel>Github URl</FormLabel>
+						<InputGroup>
+							<InputLeftAddon>https://github.com/</InputLeftAddon>
+							{user.Profile.URLs && <Input defaultValue={user.Profile.URLs[1].URL} {...register("url2")} />}
+							{!user.Profile.URLs && <Input {...register("url2")} disabled={user.ID == guestuser} />}
+						</InputGroup>
+					</FormControl></>}
 		</Stack>}
 		<Spacer />
 		<Stack m="10">
-			<Button onClick={updateUser}>アカウント情報を更新する</Button>
-			<Button onClick={DeleteFetch}>ユーザーを削除する</Button>
+			<Button onClick={updateUser} disabled={user.ID == guestuser}>アカウント情報を更新する</Button>
+			<Button onClick={DeleteFetch} disabled={user.ID == guestuser}>ユーザーを削除する</Button>
 		</Stack>
 	</>)
 }
