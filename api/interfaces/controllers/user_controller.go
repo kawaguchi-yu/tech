@@ -39,7 +39,7 @@ func (controller *UserController) CreateUser(c Context) (err error) {
 	u.Password = string(hashedPassword)
 	fmt.Printf("%+v\n", u)
 	u.Icon = ("dog_out.png")
-	err = controller.Interactor.Add(u)
+	err = controller.Interactor.CreateUser(u)
 	if err != nil {
 		return c.JSON(500, "Add失敗")
 	}

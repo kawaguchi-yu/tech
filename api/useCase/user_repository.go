@@ -3,7 +3,7 @@ package useCase
 import "hello/server/domain"
 
 type UserRepository interface {
-	Store(domain.User) error
+	CreateUser(domain.User) error
 	SetIcon(string, string) error
 	UpdateUser(email string, u domain.User) error
 	CreatePost(string, domain.Post) error

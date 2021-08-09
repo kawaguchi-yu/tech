@@ -8,8 +8,8 @@ type UserInteractor struct {
 	UserRepository UserRepository //user_repositoryのinterfaceで中身を定義
 }
 
-func (interactor *UserInteractor) Add(u domain.User) (err error) {
-	err = interactor.UserRepository.Store(u)
+func (interactor *UserInteractor) CreateUser(u domain.User) (err error) {
+	err = interactor.UserRepository.CreateUser(u)
 	return
 }
 func (interactor *UserInteractor) SetIcon(email string, IconPath string) (err error) {

@@ -9,7 +9,7 @@ type UserRepository struct {
 	SqlHandler
 }
 
-func (db *UserRepository) Store(user domain.User) error { //渡された値をDBに入れる
+func (db *UserRepository) CreateUser(user domain.User) error { //渡された値をDBに入れる
 	err := db.Create(&user).Error
 	if err != nil {
 		return err

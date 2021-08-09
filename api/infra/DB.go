@@ -7,9 +7,6 @@ import (
 	"hello/server/domain"
 	"hello/server/interfaces/database"
 	"io"
-	"net/http"
-	"os"
-	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -105,51 +102,6 @@ func (handler *SqlHandler) Model(value interface{}) *gorm.DB {
 }
 func (handler *SqlHandler) Save(value interface{}) *gorm.DB {
 	return handler.Conn.Save(value)
-}
-
-func SetIcon(c echo.Context, db *gorm.DB) error {
-	icon, err := c.FormFile("file") //cからファイルを取り出し
-	if err != nil {
-		fmt.Printf("ファイルが読み込めません\n")
-		return c.JSON(http.StatusBadRequest, icon)
-	}
-	src, err := icon.Open() //io.Readerに変換
-	if err != nil {
-		fmt.Printf("ファイルをioに変換できませんでした\n")
-		return c.JSON(http.StatusBadRequest, "ファイルをioに変換できませんでした")
-	}
-	defer src.Close()
-	os.Chdir("img")
-	iconModel := strings.Split(icon.Filename, ".")
-	iconName := iconModel[0]
-	extension := iconModel[1]
-	dst, err := os.Create(fmt.Sprintf("%s_out.%s", iconName, extension))
-	if err != nil { //"%s_out.%s"ここに\nを付け足すな！！！！！
-		fmt.Printf("ファイルが作れませんでした\n")
-		return c.JSON(http.StatusBadRequest, "ファイルが作れませんでした")
-	}
-	defer dst.Close()
-
-	if _, err = io.Copy(dst, src); err != nil { //ファイルの内容をコピー
-		fmt.Printf("コピーできませんでした\n")
-		return c.JSON(http.StatusBadRequest, "コピーできませんでした")
-	}
-
-	//ここまでが画像をローカルフォルダに保存する行程、ここからがuserのiconに画像データを入れる
-	email, err := ReadCookieReturnEMail(c)
-	if err != nil {
-		fmt.Printf("クッキー読み取りに失敗しました\n")
-		return c.JSON(http.StatusBadRequest, nil)
-	}
-	user := new(domain.User)
-	if err := db.First(&user, "e_mail=?", email).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, nil)
-	}
-	db.Model(&user).Update("icon", dst.Name())
-	fmt.Printf("ユーザーネーム=%v\n", user.Name)
-	fmt.Printf("正常に終了しました\n" + dst.Name())
-	return c.File(user.Icon)
-	//例c.File(test.jpg)→test.jpgのファイルが送られる。
 }
 
 func GetUserModel(b io.ReadCloser) (domain.User, error) {

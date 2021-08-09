@@ -15,11 +15,11 @@ func GetMockDB() (*gorm.DB, sqlmock.Sqlmock, error) {
 	}
 
 	// skip transaction for sqlmock testing
-	gdb, err := gorm.Open(mysql.New(mysql.Config{Conn: db, SkipInitializeWithVersion: true}), &gorm.Config{SkipDefaultTransaction: true})
+	gormdb, err := gorm.Open(mysql.New(mysql.Config{Conn: db, SkipInitializeWithVersion: true}), &gorm.Config{SkipDefaultTransaction: true})
 	if err != nil {
 		return nil, nil, err
 	}
-	return gdb, mock, nil
+	return gormdb, mock, nil
 }
 
 func TestMigrate(db *gorm.DB, mock sqlmock.Sqlmock) error {
