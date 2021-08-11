@@ -1,73 +1,137 @@
 package infra
 
-// import (
-// 	"encoding/json"
-// 	"hello/server/testdata"
-// 	"io/ioutil"
-// 	"net/http"
-// 	"net/http/httptest"
-// 	"regexp"
-// 	"strings"
-// 	"testing"
+import (
+	"database/sql/driver"
+	"hello/server/domain"
+	"hello/server/testdata"
+	"regexp"
+	"testing"
+	"time"
 
-// 	"github.com/DATA-DOG/go-sqlmock"
-// 	"github.com/labstack/echo/v4"
-// 	"github.com/stretchr/testify/assert"
-// )
+	"github.com/DATA-DOG/go-sqlmock"
+)
 
-// func TestCreate(t *testing.T) {
-// 	e := echo.New()                      //Echoインスタンスを作成し代入
-// 	body := GetCreateUserPost()          //tanaka情報をbodyに代入
-// 	userJSON, err := json.Marshal(&body) //marshalを使ってtanaka情報を構造体からjsonに変換する
-// 	if err != nil {
-// 		t.Fail()
-// 	}
-// 	//echoを使ったhttpで送ったり返したりの処理
-// 	//疑似的なhttpリクエストを受けることができる、PostされるuserJsonに対してstrings.NewReaderで読み込む
-// 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(userJSON)))
-// 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON) //ヘッダーの設定
-// 	rec := httptest.NewRecorder()                                    //レスポンスを受け止める？
-// 	c := e.NewContext(req, rec)                                      //
-// 	assert.NotNil(t, c.Request().Body)                               //指定されたオブジェクトがnilかどうかを判別する
-
-// 	db, mock, err := testdata.GetMockDB()
-// 	mock.ExpectExec(regexp.QuoteMeta(`CREATE`)).WillReturnResult(sqlmock.NewResult(1, 10)) //第一引数は主キーのIDの値
-// 	mock.ExpectExec(regexp.QuoteMeta(`INSERT`)).WillReturnResult(sqlmock.NewResult(1, 10)) //第二引数は本クエリのよって影響を受けるカラムの数
-
-// 	if err != nil {
-// 		t.Log(err)
-// 		t.Log("mockdb down")
-// 		t.Fail()
-// 	}
-// 	if err := testdata.TestMigrate(db, mock); err != nil {
-// 		t.Log(err)
-// 		t.Log("migrate down")
-// 		t.Fail()
-// 	}
-// 	if err := DBCreateUser(c, db); err != nil {
-// 		t.Log(err)
-// 		t.Log("makeuser down")
-// 		t.Fail()
-// 	}
+// func newDummyHandler(db *gorm.DB) database.SqlHandler {
+// 	sqlHandler := new(SqlHandler)
+// 	sqlHandler.Conn = db
+// 	return sqlHandler
 // }
+func TestCreate(t *testing.T) {
+	body := GetCreateUser() //tanaka情報をbodyに代入
+	db, mock, err := testdata.GetMockDB()
+	r := SqlHandler{Conn: db}
+	query := "INSERT"
+	mock.ExpectExec(regexp.QuoteMeta(query)).WillReturnResult(sqlmock.NewResult(1, 10)) //第一引数は主キーのIDの値
 
-// type CreateUserData struct {
-// 	Name     string
-// 	EMail    string
-// 	Password string
-// }
+	if err != nil {
+		t.Log(err)
+		t.Log("mockdb down")
+		t.Fail()
+	}
+	if err := r.Create(body).Error; err != nil {
+		t.Log(err)
+		t.Log("makeuser down")
+		t.Fail()
+	}
+}
+func TestDelete(t *testing.T) {
+	body := GetCreateUser() //tanaka情報をbodyに代入
+	db, mock, err := testdata.GetMockDB()
+	r := SqlHandler{Conn: db}
+	query := "DELETE FROM `users` WHERE name = ?"
+	mock.ExpectExec(regexp.QuoteMeta(query)).
+		WithArgs(body.Name).
+		WillReturnResult(sqlmock.NewResult(1, 2))
+	if err != nil {
+		t.Log(err)
+		t.Log("mockdb down")
+		t.Fail()
+	}
+	//gormのdeleteが正しく実行されているかをテスト
+	if err := r.Delete(&domain.User{}, "name = ?", body.Name).Error; err != nil {
+		t.Log(err) //正常でなければエラーが出てここで弾く
+		t.Log("delete down")
+		t.Fail()
+	}
+}
+func TestFirst(t *testing.T) {
+	body := GetCreateUser() //tanaka情報をbodyに代入
+	user := domain.User{}
+	db, mock, err := testdata.GetMockDB()
+	r := SqlHandler{Conn: db}
+	query := "SELECT * FROM `users` WHERE name = ? AND `users`.`deleted_at` IS NULL ORDER BY `users`.`id` LIMIT 1"
+	mock.ExpectQuery(regexp.QuoteMeta(query)). //mockdbは次に来る(r.First())クエリがこれであることを期待する
+							WithArgs(body.Name).                                        //クエリに?があればそこに入る値を指定する
+							WillReturnRows(sqlmock.NewRows([]string{"name", "e_mail"}). //これが返ってくることを期待する
+															AddRow(body.Name, body.EMail)) //mockdbにselectで貰ってくるデータを入れる
+	name := "tanaka"
+	email := "tanaka@gmail.com"
+	if err != nil {
+		t.Log(err)
+		t.Log("mockdb down")
+		t.Fail()
+	}
+	if err := r.First(&user, "name = ?", body.Name).Error; err != nil {
+		t.Log(err)
+		t.Log("get down")
+		t.Fail()
+	}
+	if user.Name != name || user.EMail != email { //dbから貰った値が一致しているか(変わってないか、変な値を貰ってきてないか)を判定する
+		t.Log("取得結果不一致")
+		t.Fail()
+	}
+}
 
-// //CreateUserDataという構造体のテスト用データを返す関数
-// func GetCreateUserPost() CreateUserData {
-// 	body := CreateUserData{
-// 		Name:     "tanaka",
-// 		EMail:    "tanaka@gmail.com",
-// 		Password: "tanaka1111",
-// 	}
-// 	return body
-// }
+type AnyTime struct{}
+
+func (a AnyTime) Match(v driver.Value) bool {
+	_, ok := v.(time.Time)
+	return ok
+}
+func TestUpdate(t *testing.T) {
+	user := GetCreateUser() //tanaka情報をbodyに代入
+	name := "tarou"
+	user.ID = 1 //gorm.dbの番号
+	db, mock, err := testdata.GetMockDB()
+	r := SqlHandler{Conn: db}
+	query := "UPDATE `users` SET `name`=?,`updated_at`=? WHERE `id` = ?"
+	mock.ExpectExec(regexp.QuoteMeta(query)).
+		WithArgs(name, AnyTime{}, user.ID).
+		WillReturnResult(sqlmock.NewResult(1, 10))
+	if err != nil {
+		t.Log(err)
+		t.Log("mockdb down")
+		t.Fail()
+	}
+	//gormのdeleteが正しく実行されているかをテスト
+
+	if err := r.Model(&user).Update("name", name).Error; err != nil {
+		t.Log(err) //正常でなければエラーが出てここで弾く
+		t.Log("update down")
+		t.Fail()
+	}
+	if user.Name != "tarou" {
+		t.Log("取得結果不一致")
+		t.Fail()
+	}
+}
+
+type CreateUserData struct {
+	Name  string
+	EMail string
+}
+
+//CreateUserDataという構造体のテスト用データを返す関数
+func GetCreateUser() *domain.User {
+	body := &domain.User{
+		Name:  "tanaka",
+		EMail: "tanaka@gmail.com",
+	}
+	return body
+}
+
 // func TestGetUserModel(t *testing.T) {
-// 	body := GetCreateUserPost()              //tanaka情報をbodyに入れる
+// 	body := GetCreateUser()                  //tanaka情報をbodyに入れる
 // 	jsonBody, err := json.Marshal(&body)     //jsonへと変換する
 // 	assert.Nil(t, err)                       //nilかどうかをテスト
 // 	r := strings.NewReader(string(jsonBody)) //stringのt情報を

@@ -74,7 +74,7 @@ func (handler *SqlHandler) Create(value interface{}) *gorm.DB {
 	return handler.Conn.Create(value)
 }
 func (handler *SqlHandler) Delete(value interface{}, conds ...interface{}) *gorm.DB {
-	return handler.Conn.Delete(value, conds...)
+	return handler.Conn.Unscoped().Delete(value, conds...)
 }
 func (handler *SqlHandler) First(dest interface{}, conds ...interface{}) *gorm.DB {
 	return handler.Conn.First(dest, conds...)
@@ -93,9 +93,6 @@ func (handler *SqlHandler) Update(column string, value interface{}) *gorm.DB {
 }
 func (handler *SqlHandler) Updates(values interface{}) *gorm.DB {
 	return handler.Conn.Updates(values)
-}
-func (handler *SqlHandler) Session(config *gorm.Session) *gorm.DB {
-	return handler.Conn.Session(config)
 }
 func (handler *SqlHandler) Model(value interface{}) *gorm.DB {
 	return handler.Conn.Model(value)

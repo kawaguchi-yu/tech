@@ -21,9 +21,7 @@ func GetMockDB() (*gorm.DB, sqlmock.Sqlmock, error) {
 	}
 	return gormdb, mock, nil
 }
-
 func TestMigrate(db *gorm.DB, mock sqlmock.Sqlmock) error {
-
 	db.AutoMigrate(&domain.User{})
 	return nil
 }
