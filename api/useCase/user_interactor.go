@@ -8,8 +8,12 @@ type UserInteractor struct {
 	UserRepository UserRepository //user_repositoryのinterfaceで中身を定義
 }
 
-func (interactor *UserInteractor) CreateUser(u domain.User) (err error) {
-	err = interactor.UserRepository.CreateUser(u)
+func (interactor *UserInteractor) CreateUser(user domain.User) (err error) {
+	err = interactor.UserRepository.CreateUser(user)
+	return
+}
+func (interactor *UserInteractor) CreateGood(good domain.Good) (err error) {
+	err = interactor.UserRepository.CreateGood(good)
 	return
 }
 func (interactor *UserInteractor) SetIcon(email string, IconPath string) (err error) {
@@ -18,6 +22,10 @@ func (interactor *UserInteractor) SetIcon(email string, IconPath string) (err er
 }
 func (interactor *UserInteractor) DeleteAllByUserEMail(email string) (err error) {
 	err = interactor.UserRepository.DeleteAllByUserEMail(email)
+	return
+}
+func (interactor *UserInteractor) DeleteGoodByPostID(postID uint, userID uint) (err error) {
+	err = interactor.UserRepository.DeleteGoodByPostID(postID, userID)
 	return
 }
 func (interactor *UserInteractor) ReturnUserBYEMail(email string) (user domain.User, err error) {
@@ -30,6 +38,14 @@ func (interactor *UserInteractor) ReturnAllUserPost() (users []domain.User, post
 }
 func (interactor *UserInteractor) ReturnUserPostByName(name string) (user domain.User, err error) {
 	user, err = interactor.UserRepository.ReturnUserPostByName(name)
+	return
+}
+func (interactor *UserInteractor) ReturnGoodedPost(userID uint) (users []domain.User, posts []domain.Post, goods []domain.Good, err error) {
+	users, posts, goods, err = interactor.UserRepository.ReturnGoodedPost(userID)
+	return
+}
+func (interactor *UserInteractor) ReturnUserAndPostByPostID(id uint) (user domain.User, err error) {
+	user, err = interactor.UserRepository.ReturnUserAndPostByPostID(id)
 	return
 }
 func (interactor *UserInteractor) CreatePost(email string, post domain.Post) (err error) {

@@ -29,22 +29,22 @@ func NewUserController(sqlHandler database.SqlHandler) *UserController {
 	}
 }
 func (controller *UserController) CreateUser(c Context) (err error) {
-	u := domain.User{}
-	c.Bind(&u)
-	rawPassword := []byte(u.Password)
+	user := domain.User{}
+	c.Bind(&user)
+	rawPassword := []byte(user.Password)
 	hashedPassword, err := bcrypt.GenerateFromPassword(rawPassword, 4)
 	if err != nil {
 		return err
 	}
-	u.Password = string(hashedPassword)
-	fmt.Printf("%+v\n", u)
-	u.Icon = ("dog_out.png")
-	err = controller.Interactor.CreateUser(u)
+	user.Password = string(hashedPassword)
+	fmt.Printf("%+v\n", user)
+	user.Icon = ("dog_out.png")
+	err = controller.Interactor.CreateUser(user)
 	if err != nil {
-		return c.JSON(500, "Add失敗")
+		return c.JSON(http.StatusBadRequest, "ユーザー登録できませんでした")
 	}
 	claims := jwt.StandardClaims{
-		Issuer:    u.EMail,
+		Issuer:    user.EMail,
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // 有効期限
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -59,25 +59,37 @@ func (controller *UserController) CreateUser(c Context) (err error) {
 	cookie.Path = "/"
 	cookie.HttpOnly = true
 	c.SetCookie(cookie)
-	c.JSON(201, "Add成功！")
+	c.JSON(http.StatusOK, "Add成功！")
 	return
 }
-func (controller *UserController) UpdateUser(c Context) (err error) {
-	u := domain.User{}
-	if err := c.Bind(&u); err != nil {
+func (controller *UserController) CreateGood(c Context) (err error) {
+	good := domain.Good{}
+	if err := c.Bind(&good); err != nil {
 		fmt.Printf("Contextからuserを読めませんでした\n")
 		c.JSON(http.StatusBadRequest, "Contextからuserを読めませんでした")
 	}
-	if err := GuestUserCheck(u.ID); err != nil {
+	err = controller.Interactor.CreateGood(good)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "goodできませんでした")
+	}
+	return c.JSON(http.StatusOK, "正常に終了しました")
+}
+func (controller *UserController) UpdateUser(c Context) (err error) {
+	user := domain.User{}
+	if err := c.Bind(&user); err != nil {
+		fmt.Printf("Contextからuserを読めませんでした\n")
+		c.JSON(http.StatusBadRequest, "Contextからuserを読めませんでした")
+	}
+	if err := GuestUserCheck(user.ID); err != nil {
 		return c.JSON(http.StatusBadRequest, "GuestUserはユーザー情報を変更する権限がありません")
 	}
-	fmt.Printf("user=%v\n", u)
+	fmt.Printf("user=%v\n", user)
 	email, err := ReadCookieReturnEMail(c)
 	if err != nil {
 		fmt.Printf("Contextからemailを読めませんでした\n")
 		c.JSON(http.StatusBadRequest, "Contextからemailを読めませんでした")
 	}
-	err = controller.Interactor.UpdateUser(email, u)
+	err = controller.Interactor.UpdateUser(email, user)
 	if err != nil {
 		fmt.Printf("Contextからemailを読めませんでした\n")
 		c.JSON(http.StatusBadRequest, "updateできませんでした")
@@ -190,7 +202,7 @@ func (controller *UserController) DeleteUser(c Context) (err error) {
 	})
 	if err != nil || !token.Valid {
 		fmt.Printf("パルスに失敗しました\n")
-		return c.JSON(500, "パルスに失敗しました")
+		return c.JSON(http.StatusBadRequest, "パルスに失敗しました")
 	}
 	claims := token.Claims.(*Claims)
 	email := claims.Issuer
@@ -209,8 +221,16 @@ func (controller *UserController) DeleteUser(c Context) (err error) {
 	cookie.Expires = time.Now() //deleteしたuserのクッキーを消す
 	c.SetCookie(cookie)
 	fmt.Printf("ユーザーを削除しました。\n")
-	c.JSON(201, "Delete成功！")
+	c.JSON(http.StatusOK, "Delete成功！")
 	return
+}
+func (controller *UserController) DeleteGoodByPostID(c Context) (err error) {
+	good := new(domain.Good)
+	c.Bind(good)
+	if err := controller.Interactor.DeleteGoodByPostID(good.PostID, good.UserID); err != nil {
+		return c.JSON(http.StatusBadRequest, "Goodを削除できませんでした")
+	}
+	return c.JSON(http.StatusOK, "正常に終了しました")
 }
 func (controller *UserController) GuestLogin(c Context) (err error) {
 	user, err := controller.Interactor.GuestLogin()
@@ -323,4 +343,41 @@ func (controller *UserController) ReturnUserPostByName(c Context) error {
 	}
 	fmt.Printf("ReturnUserPostByNameは正常に終了しました\n")
 	return c.JSON(http.StatusOK, user)
+}
+func (controller *UserController) ReturnUserAndPostByPostID(c Context) error {
+	post := new(domain.Post)
+	c.Bind(post)
+	user, err := controller.Interactor.ReturnUserAndPostByPostID(post.UserID)
+	if err != nil {
+		c.JSON(http.StatusOK, "idからユーザーを取得できませんでした")
+	}
+	return c.JSON(http.StatusOK, user)
+}
+func (controller *UserController) ReturnGoodedPost(c Context) error {
+	good := new(domain.Good)
+	c.Bind(good)
+	fmt.Printf("%v\n", good)
+	users, posts, goods, err := controller.Interactor.ReturnGoodedPost(good.UserID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, "記事を取得できませんでした")
+	}
+	var returnUsers []domain.User
+	for _, user := range users {
+		for _, post := range posts {
+			for _, good := range goods {
+				if post.ID == good.PostID {
+					post.Goods = append(post.Goods, good)
+				}
+			}
+			if user.ID == post.UserID {
+				user.Posts = append(user.Posts, post)
+			}
+		}
+		if user.Posts != nil {
+			user.Icon = getIcon(user.Icon)
+			returnUsers = append(returnUsers, user)
+		}
+	}
+	fmt.Printf("正常に終了しました\n")
+	return c.JSON(http.StatusOK, returnUsers)
 }

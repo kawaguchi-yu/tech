@@ -21,7 +21,7 @@ type user = {
 	Posts: post[]
 	Profile: string
 	ProfileID: string
-	Goods: string
+	Goods: number
 	Icon: string
 };
 type post = {
@@ -37,8 +37,7 @@ type post = {
 	WrongAnswer2: string
 	WrongAnswer3: string
 	Explanation: string
-	Tags: any
-	Goods: any
+	Goods: number
 	Icon: Blob
 };
 const Home = (): JSX.Element => {
@@ -88,7 +87,6 @@ const Home = (): JSX.Element => {
 					WrongAnswer2: postData.WrongAnswer2,
 					WrongAnswer3: postData.WrongAnswer3,
 					Explanation: postData.Explanation,
-					Tags: postData.Tags,
 					Goods: postData.Goods,
 				}
 
@@ -105,6 +103,7 @@ const Home = (): JSX.Element => {
 							passHref>
 							<Box as="a" fontWeight="bold" bgColor="azure">{userInfo.Title}</Box>
 						</NextLink>
+						<Box>いいね数{postData.Goods}</Box>
 					</VStack>
 				)
 			})}

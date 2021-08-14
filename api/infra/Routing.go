@@ -45,6 +45,14 @@ func Routing(e *echo.Echo) {
 		fmt.Printf("/user\n")
 		return userController.ReadCookieReturnUser(c)
 	})
+	e.POST("/getuserbyid", func(c echo.Context) error {
+		fmt.Printf("/getuserbyid\n")
+		return userController.ReturnUserAndPostByPostID(c)
+	})
+	e.POST("/returngoodedpost", func(c echo.Context) error {
+		fmt.Printf("/returngoodedpost\n")
+		return userController.ReturnGoodedPost(c)
+	})
 	e.GET("/guestlogin", func(c echo.Context) error {
 		fmt.Printf("/guestlogin\n")
 		return userController.GuestLogin(c)
@@ -52,6 +60,14 @@ func Routing(e *echo.Echo) {
 	e.POST("/login", func(c echo.Context) error {
 		fmt.Printf("/login\n")
 		return userController.Login(c)
+	})
+	e.POST("/good", func(c echo.Context) error {
+		fmt.Printf("/good\n")
+		return userController.CreateGood(c)
+	})
+	e.POST("/deletegood", func(c echo.Context) error {
+		fmt.Printf("/deletegood\n")
+		return userController.DeleteGoodByPostID(c)
 	})
 	e.POST("/signup", func(c echo.Context) error {
 		fmt.Printf("/signup\n")

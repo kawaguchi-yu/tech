@@ -11,7 +11,6 @@ import (
 // 出力の定義
 
 func main() {
-	// infra.DBInit()
 	e := echo.New() //eにecho.New(echoを使っている)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost"},
