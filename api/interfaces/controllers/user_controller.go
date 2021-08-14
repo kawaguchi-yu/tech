@@ -310,7 +310,7 @@ func (controller *UserController) ReadCookieReturnUser(c Context) (err error) {
 	return c.JSON(http.StatusOK, user)
 }
 func (controller *UserController) ReturnAllUserPost(c Context) error {
-	users, posts, err := controller.Interactor.ReturnAllUserPost()
+	users, posts, goods, err := controller.Interactor.ReturnAllUserPost()
 	if err != nil {
 		fmt.Printf("ユーザーを取得できませんでした\n")
 		return c.JSON(http.StatusBadRequest, "ユーザーを取得できませんでした")
@@ -318,6 +318,11 @@ func (controller *UserController) ReturnAllUserPost(c Context) error {
 	var returnUsers []domain.User
 	for _, user := range users {
 		for _, post := range posts {
+			for _, good := range goods {
+				if post.ID == good.PostID {
+					post.Goods = append(post.Goods, good)
+				}
+			}
 			if post.UserID == user.ID {
 				user.Posts = append(user.Posts, post)
 			}

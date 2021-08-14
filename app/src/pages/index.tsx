@@ -3,8 +3,9 @@ import {
 	Stack,
 	Box,
 	VStack,
-	Button,
 	Image,
+	Grid,
+	GridItem,
 } from '@chakra-ui/react';
 import NextLink from "next/link";
 import Link from "./components/Link"
@@ -37,9 +38,14 @@ type post = {
 	WrongAnswer2: string
 	WrongAnswer3: string
 	Explanation: string
-	Goods: number
+	Goods: good[]
 	Icon: Blob
 };
+type good = {
+	ID: number
+	UserId: number
+	PostID: number
+}
 const Home = (): JSX.Element => {
 	const [postDatas, setPostDatas] = useState<post[]>([])
 	useEffect(() => {
@@ -48,10 +54,10 @@ const Home = (): JSX.Element => {
 			method: "GET",
 		}).then((res) => res.json())
 			.then((datas) => {
+				var returnPostDatas: post[]
 				const userDatas: user[] = datas
 				console.log("貰ってきたデータ", datas)
-				userDatas.forEach(userData =>//user型データがいくつか入ってる
-				{
+				userDatas.forEach(userData =>{
 					let bin = atob(userData.Icon.replace(/^.*,/, ''));
 					let buffer = new Uint8Array(bin.length);
 					for (let i = 0; i < bin.length; i++) {
@@ -59,13 +65,17 @@ const Home = (): JSX.Element => {
 					} let blob = new Blob([buffer.buffer], {
 						type: "image/jpeg"
 					});
-					userData.Posts.forEach(userDataPost =>//user型データの中のpost
-					{
-						userDataPost.Name = userData.Name,
-						userDataPost.Icon = blob
-							setPostDatas(postDatas => [...postDatas, userDataPost])
+					userData.Posts.forEach(postData =>{
+						postData.Name = userData.Name,
+						postData.Icon = blob
+						if (returnPostDatas == null) {
+							returnPostDatas = [postData]
+						} else {
+							returnPostDatas = [...returnPostDatas, postData]
+						}
 					})
 				})
+				setPostDatas(returnPostDatas)
 			})
 			.catch(() => {
 				console.error("データを貰ってくることができませんでした")
@@ -75,35 +85,22 @@ const Home = (): JSX.Element => {
 		return (<>
 			{postDatas.map((postData) => {
 				const userInfo = {
-					Name: postData.Name,
-					ID: postData.ID,
-					CreatedAt: postData.CreatedAt,
-					UpdatedAt: postData.UpdatedAt,
-					DeletedAt: postData.DeletedAt,
-					UserID: postData.UserID,
 					Title: postData.Title,
-					Answer: postData.Answer,
-					WrongAnswer1: postData.WrongAnswer1,
-					WrongAnswer2: postData.WrongAnswer2,
-					WrongAnswer3: postData.WrongAnswer3,
-					Explanation: postData.Explanation,
-					Goods: postData.Goods,
 				}
-
 				return (
-					<VStack key={userInfo.ID} padding="10" border="solid 1px">
+					<VStack key={postData.ID} padding="10" bg="white" boxShadow="xs">
 						<Image boxSize="50px"
 							borderRadius="full"
 							src={(window.URL.createObjectURL(postData.Icon))}
 							alt="select picture" />
 						<Box bgColor="aquamarine"><Link href={`/${postData.Name}`}>{postData.Name}</Link>が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
 						<NextLink
-							as={`/items/${userInfo.ID}`}
+							as={`/items/${postData.ID}`}
 							href={{ pathname: `/items/[ID]`, query: userInfo }}
 							passHref>
 							<Box as="a" fontWeight="bold" bgColor="azure">{userInfo.Title}</Box>
 						</NextLink>
-						<Box>いいね数{postData.Goods}</Box>
+						<Box>いいね数{postData.Goods?postData.Goods.length:0}</Box>
 					</VStack>
 				)
 			})}
@@ -114,19 +111,16 @@ const Home = (): JSX.Element => {
 		<>
 			<chakra.div>
 				<Template />
-				クイズを投稿して知見を共有しませんか！
-				<Stack direction="row" align="center">
-					<Link href="/post">
-						<Button colorScheme="teal" variant="solid">
-							クイズを投稿する
-						</Button>
-					</Link>
-				</Stack>
-				<Box align="center" p="10">皆が投稿したクイズ一覧</Box>
 				<Stack>
-					<VStack>
-						<PostsView />
-					</VStack>
+				<Grid
+					h="200px"
+					templateRows="repeat(3, 1fr)"
+					templateColumns="repeat(1, 1fr)"
+					margin={5}
+					gap={2}
+				>
+					<GridItem rowSpan={2} align="center">皆が投稿したクイズ一覧<PostsView /></GridItem>
+					</Grid>
 				</Stack>
 			</chakra.div>
 		</>

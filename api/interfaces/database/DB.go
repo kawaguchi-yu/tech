@@ -132,16 +132,20 @@ func (db *UserRepository) DeleteGoodByPostID(postID uint, userID uint) (err erro
 	fmt.Printf("正常に終了しましたpostid=%vuserid=%v\n", postID, userID)
 	return nil
 }
-func (db *UserRepository) ReturnAllUserPost() (users []domain.User, posts []domain.Post, err error) {
-	var user []domain.User
-	if err := db.Find(&user).Error; err != nil {
-		return nil, nil, err
+func (db *UserRepository) ReturnAllUserPost() (returnUsers []domain.User, returnPosts []domain.Post, returnGoods []domain.Good, err error) {
+	var users []domain.User
+	if err := db.Find(&users).Error; err != nil {
+		return nil, nil, nil, err
 	}
-	var post []domain.Post
-	if err := db.Find(&post).Error; err != nil {
-		return nil, nil, err
+	var posts []domain.Post
+	if err := db.Find(&posts).Error; err != nil {
+		return nil, nil, nil, err
 	}
-	return user, post, nil
+	var goods []domain.Good
+	if err := db.Find(&goods).Error; err != nil {
+		return nil, nil, nil, err
+	}
+	return users, posts, goods, nil
 }
 func (db *UserRepository) ReturnGoodedPost(userID uint) (returnUsers []domain.User, returnPosts []domain.Post, returnGoods []domain.Good, err error) {
 	var users []domain.User

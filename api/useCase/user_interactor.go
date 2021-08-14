@@ -32,8 +32,8 @@ func (interactor *UserInteractor) ReturnUserBYEMail(email string) (user domain.U
 	user, err = interactor.UserRepository.ReturnUserBYEMail(email)
 	return
 }
-func (interactor *UserInteractor) ReturnAllUserPost() (users []domain.User, posts []domain.Post, err error) {
-	users, posts, err = interactor.UserRepository.ReturnAllUserPost()
+func (interactor *UserInteractor) ReturnAllUserPost() (users []domain.User, posts []domain.Post, goods []domain.Good, err error) {
+	users, posts, goods, err = interactor.UserRepository.ReturnAllUserPost()
 	return
 }
 func (interactor *UserInteractor) ReturnUserPostByName(name string) (user domain.User, err error) {
