@@ -40,6 +40,10 @@ func (interactor *UserInteractor) ReturnUserPostByName(name string) (user domain
 	user, err = interactor.UserRepository.ReturnUserPostByName(name)
 	return
 }
+func (interactor *UserInteractor) ReturnGoodedPostByWord(word string) (users []domain.User, posts []domain.Post, goods []domain.Good, err error) {
+	users, posts, goods, err = interactor.UserRepository.ReturnGoodedPostByWord(word)
+	return
+}
 func (interactor *UserInteractor) ReturnGoodedPost(userID uint) (users []domain.User, posts []domain.Post, goods []domain.Good, err error) {
 	users, posts, goods, err = interactor.UserRepository.ReturnGoodedPost(userID)
 	return

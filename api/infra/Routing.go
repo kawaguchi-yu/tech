@@ -53,6 +53,10 @@ func Routing(e *echo.Echo) {
 		fmt.Printf("/returngoodedpost\n")
 		return userController.ReturnGoodedPost(c)
 	})
+	e.POST("/returngoodedpostbyword", func(c echo.Context) error {
+		fmt.Printf("/returngoodedpostbyword\n")
+		return userController.ReturnGoodedPostByWord(c)
+	})
 	e.GET("/guestlogin", func(c echo.Context) error {
 		fmt.Printf("/guestlogin\n")
 		return userController.GuestLogin(c)

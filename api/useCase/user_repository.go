@@ -16,6 +16,7 @@ type UserRepository interface {
 	ReturnUserPostByName(string) (domain.User, error)
 	ReturnUserAndPostByPostID(uint) (domain.User, error)
 	ReturnAllUserPost() ([]domain.User, []domain.Post, []domain.Good, error)
+	ReturnGoodedPostByWord(word string) (returnUsers []domain.User, returnPosts []domain.Post, returnGoods []domain.Good, err error)
 	ReturnGoodedPost(userID uint) ([]domain.User, []domain.Post, []domain.Good, error)
 	GuestLogin() (domain.User, error)
 }

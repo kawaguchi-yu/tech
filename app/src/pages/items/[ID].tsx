@@ -1,5 +1,6 @@
 import {
   HStack,
+  VStack,
   Stack,
   Button,
   Box,
@@ -7,13 +8,15 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  Grid,
+  GridItem,
+  useRadio,
 } from '@chakra-ui/react';
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useRouter } from 'next/router'
 import NextLink from "next/link";
 import Link from "../components/Link"
 import { StarIcon } from '@chakra-ui/icons'
-import { useEffect } from 'react';
 import Template from '../template';
 type user = {
   ID: number
@@ -82,7 +85,7 @@ const Fuga = () => {
   const router = useRouter();
   const [URLQuery, setURLQuery] = useState<URLPath>()
   const [answer, setAnswer] = useState<string>()
-  const [choicesData, setChoicesData] = useState<any>()
+  const [choicesData, setChoicesData] = useState<string[]>()
   const [userInPost, setUserInPost] = useState<user>(returnData)
   const [user, setUser] = useState<user>(returnData);
   const [isGooded, setIsGooded] = useState<boolean>(false)
@@ -209,19 +212,22 @@ const Fuga = () => {
       <Box><Template /></Box>
       <Stack align="center">
         <Stack>
-          <Box>これを見ているユーザーのID　{user.ID}</Box>
-          <Box>記事のID　{userInPost && userInPost.Posts[0].ID}</Box>
-          <Box>記事のUserID　{userInPost.Posts[0].UserID}</Box>
-          <Box>記事制作者　{userInPost.Name}</Box>
-          <Box>問題:　　{userInPost.Posts[0].Title}</Box>
+          <Box>{userInPost.Posts[0].Title}</Box>
         </Stack>
-        <HStack>
+        <Grid
+          h="200px"
+          templateRows="repeat(2, 1fr)"
+          templateColumns="repeat(5, 1fr)"
+          gap={4}
+        >
           {choicesData && <>
-            <Button onClick={getAnswer} value={choicesData[0]}>回答1:{choicesData[0]}</Button>
-            <Button onClick={getAnswer} value={choicesData[1]}>回答2:{choicesData[1]}</Button>
-            <Button onClick={getAnswer} value={choicesData[2]}>回答3:{choicesData[2]}</Button>
-            <Button onClick={getAnswer} value={choicesData[3]}>回答4:{choicesData[3]}</Button>
-          </>}</HStack>
+            {choicesData.map((choiceData) => {
+              return (
+                <GridItem key={choiceData} rowSpan={2} colSpan={5}><Button key={choiceData} onClick={getAnswer} value={choiceData}>回答:{choiceData}</Button></GridItem>
+              )
+            })}
+          </>}
+        </Grid>
         <Stack>
           <>{answer}</>
           {answer == "不正解！" && <>正解は{userInPost.Posts[0].Answer}です</>}
@@ -253,9 +259,8 @@ const Fuga = () => {
           ? <Button disabled>{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGooded : uiGooded}</Button>
           : isGooded == true
             ? <Button onClick={() => { DeleteGoodFetch(), setIsGooded(false), setUiGooded(uiGooded - 1) }}><StarIcon color="gold" />いいねしました。{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGooded : uiGooded}</Button>
-            : user.ID != null
-              ? <Button onClick={() => { GoodFetch(), setIsGooded(true), setUiGooded(uiGooded + 1) }} ><StarIcon />いいねする{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGooded : uiGooded}</Button>
-              : <Button disabled>ログインしないといいねはできません。いいね数{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGooded : uiGooded}</Button>
+            : <Button onClick={() => { GoodFetch(), setIsGooded(true), setUiGooded(uiGooded + 1) }} disabled={!user.ID} ><StarIcon />いいねする{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGooded : uiGooded}
+            {!user.ID && <>ログインしないといいねができません</>}</Button>
 
         }
       </Stack>

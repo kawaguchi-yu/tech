@@ -10,6 +10,7 @@ import {
 	Spacer,
 	Heading,
 	Image,
+	Input,
 } from '@chakra-ui/react';
 import Link from "./components/Link"
 import { useRouter } from 'next/router'
@@ -56,7 +57,7 @@ const Template = () => {
 				console.error("データを貰ってくることができませんでした")
 			})
 	}, [])
-	const GuestLogin = () =>{
+	const GuestLogin = () => {
 		fetch("http://localhost:8080/guestlogin", {
 			mode: "cors",
 			method: "GET",
@@ -76,6 +77,16 @@ const Template = () => {
 				router.reload()
 			})
 	}
+	const [word,setWord] = useState<string>();
+	const Search = () => {
+		if (!word){
+		return;
+	}
+	router.push({
+		pathname: `/search/`,
+		query: {word}
+	})
+}
 	return (
 		<>
 			<Flex bg={useColorModeValue("blue.100", 'gray.900')} alignItems={'center'}>
@@ -84,6 +95,16 @@ const Template = () => {
 						<Heading>Techer</Heading>
 					</Box>
 				</Link>
+				<Input
+				value={word}
+				onChange={(e)=> setWord(e.target.value)}
+				>
+				</Input>
+				<Button
+				onClick={Search}
+				disabled={!word}>
+					偏移
+				</Button>
 				<Spacer />
 				<Box mr={4}>
 					<Flex direction="row" align="center">
@@ -107,9 +128,9 @@ const Template = () => {
 								</Menu>
 							</>
 							: <>
-							<Button　mr="4" colorScheme="linkedin" onClick={GuestLogin}>
-								ゲストログイン
-							</Button>
+								<Button mr="4" colorScheme="linkedin" onClick={GuestLogin}>
+									ゲストログイン
+								</Button>
 								<Link href="/signup">
 									<Button mr="4" colorScheme="teal">
 										ユーザー登録

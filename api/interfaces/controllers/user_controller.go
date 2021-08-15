@@ -349,6 +349,7 @@ func (controller *UserController) ReturnUserPostByName(c Context) error {
 	fmt.Printf("ReturnUserPostByNameは正常に終了しました\n")
 	return c.JSON(http.StatusOK, user)
 }
+
 func (controller *UserController) ReturnUserAndPostByPostID(c Context) error {
 	post := new(domain.Post)
 	c.Bind(post)
@@ -357,6 +358,44 @@ func (controller *UserController) ReturnUserAndPostByPostID(c Context) error {
 		c.JSON(http.StatusOK, "idからユーザーを取得できませんでした")
 	}
 	return c.JSON(http.StatusOK, user)
+}
+
+type search struct {
+	Word string
+}
+
+func (controller *UserController) ReturnGoodedPostByWord(c Context) error {
+	data := new(search)
+	if err := c.Bind(data); err != nil {
+		return err
+	}
+	fmt.Printf("%v\n", data)
+	if data.Word == "" {
+		return c.JSON(http.StatusBadRequest, "wordがnullです")
+	}
+	users, posts, goods, err := controller.Interactor.ReturnGoodedPostByWord(data.Word)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "ユーザー情報が取得できませんでした")
+	}
+	var returnUsers []domain.User
+	for _, user := range users {
+		for _, post := range posts {
+			for _, good := range goods {
+				if post.ID == good.PostID {
+					post.Goods = append(post.Goods, good)
+				}
+			}
+			if user.ID == post.UserID {
+				user.Posts = append(user.Posts, post)
+			}
+		}
+		if user.Posts != nil {
+			user.Icon = getIcon(user.Icon)
+			returnUsers = append(returnUsers, user)
+		}
+	}
+	fmt.Printf("正常に終了しました\n")
+	return c.JSON(http.StatusOK, returnUsers)
 }
 func (controller *UserController) ReturnGoodedPost(c Context) error {
 	good := new(domain.Good)

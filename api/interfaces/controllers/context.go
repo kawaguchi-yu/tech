@@ -12,4 +12,5 @@ type Context interface {
 	File(file string) error
 	Bind(interface{}) error
 	JSON(int, interface{}) error
+	FormValue(name string) string
 }
