@@ -86,7 +86,7 @@ const Fuga = () => {
   const [userInPost, setUserInPost] = useState<user>(returnData)
   const [user, setUser] = useState<user>(returnData);
   const [isGooded, setIsGooded] = useState<boolean>(false)
-  const [uiGooded,setUiGooded] = useState<number>(0)
+  const [uiGooded, setUiGooded] = useState<number>(0)
   console.log(user)
   useEffect(() => {
     if (router.asPath !== router.route) {//厳密不等価
@@ -138,7 +138,7 @@ const Fuga = () => {
       })
       .catch((err) => { console.log(err) })
   };
-  const DeleteGoodFetch = () =>{
+  const DeleteGoodFetch = () => {
     const GoodData = { userID: Number(user.ID), postID: Number(router.query.ID) }
     fetch("http://localhost:8080/deletegood", {
       mode: "cors",
@@ -154,6 +154,7 @@ const Fuga = () => {
       .catch((err) => { console.log(err) })
   }
   const GoodFetch = () => {
+
     const GoodData = { userID: Number(user.ID), postID: Number(router.query.ID) }
     console.log("GoodData", GoodData)
     fetch("http://localhost:8080/good", {
@@ -185,13 +186,15 @@ const Fuga = () => {
     setChoicesData(choices)
   }
   const GoodCheck = () => {
-    if (userInPost.Posts[0].Goods){
-    userInPost.Posts[0].Goods.map(goodData => {
-      console.log("a",goodData.UserID,"=",user.ID)
-      if (goodData.UserID == user.ID && user.ID != 0) {
-        setIsGooded(true)
-        console.log("isgoodedがtrueになりました",goodData.UserID,"=",user.ID)
-      }})}
+    if (userInPost.Posts[0].Goods) {
+      userInPost.Posts[0].Goods.map(goodData => {
+        console.log("a", goodData.UserID, "=", user.ID)
+        if (goodData.UserID == user.ID && user.ID != 0) {
+          setIsGooded(true)
+          console.log("isgoodedがtrueになりました", goodData.UserID, "=", user.ID)
+        }
+      })
+    }
   }
   useEffect(() => { RandomAnswer(), GoodCheck() }, [userInPost])
   const getAnswer = (event) => {
@@ -241,18 +244,20 @@ const Fuga = () => {
                   as={`/post/${router.query.ID}`}
                   href={{ pathname: `/post/[ID]`, query: router.query }}
                   passHref>
-                  <Box>記事を編集する</Box>
+                  <Button>記事を編集する</Button>
                 </NextLink></MenuItem>
-              <MenuItem><Button onClick={DeletePostFetch}><StarIcon />記事を削除する</Button></MenuItem>
+              <MenuItem><Button onClick={DeletePostFetch}>記事を削除する</Button></MenuItem>
             </MenuList>
           </Menu>}
         {userInPost.Posts[0].UserID == user.ID
-          ? <Button onClick={GoodFetch} disabled>記事をいいねする。記事のID={router.query.ID}見てるユーザーのID={user.ID}</Button>
+          ? <Button disabled>{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGooded : uiGooded}</Button>
           : isGooded == true
-            ? <Button onClick={()=>{DeleteGoodFetch(),setIsGooded(false),setUiGooded(uiGooded-1)}}><StarIcon color="gold" />いいねしました。{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length+uiGooded:uiGooded}</Button>
-            : <Button onClick={()=>{GoodFetch(),setIsGooded(true),setUiGooded(uiGooded+1)}}><StarIcon　/>いいねする{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length+uiGooded:uiGooded}</Button>
+            ? <Button onClick={() => { DeleteGoodFetch(), setIsGooded(false), setUiGooded(uiGooded - 1) }}><StarIcon color="gold" />いいねしました。{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGooded : uiGooded}</Button>
+            : user.ID != null
+              ? <Button onClick={() => { GoodFetch(), setIsGooded(true), setUiGooded(uiGooded + 1) }} ><StarIcon />いいねする{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGooded : uiGooded}</Button>
+              : <Button disabled>ログインしないといいねはできません。いいね数{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGooded : uiGooded}</Button>
+
         }
-        {/* {post && <>{JSON.stringify(post)}</>} */}
       </Stack>
     </>)
 }

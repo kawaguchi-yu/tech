@@ -78,7 +78,7 @@ const Template = () => {
 	}
 	return (
 		<>
-			<Flex bg={useColorModeValue('gray.100', 'gray.900')} alignItems={'center'}>
+			<Flex bg={useColorModeValue("blue.100", 'gray.900')} alignItems={'center'}>
 				<Link href="/">
 					<Box h={16} p={2} color="Highlight">
 						<Heading>Techer</Heading>
