@@ -7,8 +7,10 @@ import (
 	"hello/server/domain"
 	"hello/server/interfaces/database"
 	"io"
+	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
@@ -62,11 +64,14 @@ type env struct {
 }
 
 func getEnv() env {
+	if err := godotenv.Load(".env"); err != nil {
+		fmt.Printf(".envファイルの読み込みが失敗しました\n")
+	}
 	e := env{
-		userName: "root",
-		password: "hoge",
-		host:     "db:3306",
-		dbName:   "db",
+		userName: os.Getenv("USERNAME"),
+		password: os.Getenv("PASSWORD"),
+		host:     os.Getenv("HOST"),
+		dbName:   os.Getenv("DBNAME"),
 	}
 	return e
 }
