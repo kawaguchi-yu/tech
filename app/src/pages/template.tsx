@@ -11,10 +11,16 @@ import {
 	Heading,
 	Image,
 	Input,
+	InputGroup,
+	InputRightElement,
+	IconButton,
+	FormControl,
 } from '@chakra-ui/react';
+import {Search2Icon} from '@chakra-ui/icons'
 import Link from "./components/Link"
 import { useRouter } from 'next/router'
 import React, { useState, useEffect } from "react"
+import { useForm } from "react-hook-form";
 type user = {
 	ID: string
 	CreatedAt: string
@@ -29,12 +35,21 @@ type user = {
 	Icon: string
 	IconBlob: Blob
 };
+type Form = {
+	Word: string
+}
+const data:Form = {
+	Word: ""
+}
 const SearchFunc = () => {
+	const { register, handleSubmit, formState, formState: { errors }, getValues } = useForm<Form>({
+		mode: "onChange"
+	});
 	const router = useRouter()
-	const [word, setWord] = useState<string>();
 	const Search = () => {
-		if (!word) {
-			return;
+		const word = getValues("Word")
+		if (word == "") {
+			return
 		}
 		router.push({
 			pathname: `/search/`,
@@ -42,16 +57,28 @@ const SearchFunc = () => {
 		})
 	}
 	return (<>
-		<Input h={10} w={500}
-			value={word}
-			onChange={(e) => setWord(e.target.value)}
-		>
-		</Input>
-		<Button
+	<FormControl isInvalid={errors.Word ? true : false}>
+		<InputGroup>
+		<Input
+			{...register("Word", {
+				required: true,
+				pattern: {
+					value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+					message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+				}
+			})}
+		/>
+			
+			<InputRightElement>
+		<IconButton
+		aria-label="Search database"
+		icon={<Search2Icon />}
 			onClick={Search}
-			disabled={!word}>
-			偏移
-		</Button>
+			disabled={!formState.isValid}/>
+			</InputRightElement>
+			</InputGroup>
+			{errors.Word && errors.Word.message}
+		</FormControl>
 	</>)
 }
 const Template = () => {
@@ -119,8 +146,8 @@ const Template = () => {
 							? <>
 								<Menu>
 									<MenuButton as={Button} h={16} p={2} rounded="full">
-										{user.IconBlob && <Image										
-											boxSize="50px"									
+										{user.IconBlob && <Image
+											boxSize="50px"
 											src={(window.URL.createObjectURL(user.IconBlob))}
 											alt="select picture" />}
 									</MenuButton>
