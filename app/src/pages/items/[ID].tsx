@@ -1,6 +1,4 @@
 import {
-  HStack,
-  VStack,
   Stack,
   Button,
   Box,
@@ -10,7 +8,6 @@ import {
   MenuItem,
   Grid,
   GridItem,
-  useRadio,
 } from '@chakra-ui/react';
 import React, { useState, useEffect } from "react"
 import { useRouter } from 'next/router'
@@ -89,8 +86,7 @@ const Fuga = () => {
   const [userInPost, setUserInPost] = useState<user>(returnData)
   const [user, setUser] = useState<user>(returnData);
   const [isGooded, setIsGooded] = useState<boolean>(false)
-  const [uiGooded, setUiGooded] = useState<number>(0)
-  console.log(user)
+  const [uiGoodedCount, setUiGoodedCount] = useState<number>(0)
   useEffect(() => {
     if (router.asPath !== router.route) {//厳密不等価
       const queryID: URLPath = { UserID: Number(router.query.ID) }
@@ -220,12 +216,11 @@ const Fuga = () => {
           templateColumns="repeat(5, 1fr)"
           gap={4}
         >
-          {choicesData && <>
-            {choicesData.map((choiceData) => {
-              return (
-                <GridItem key={choiceData} rowSpan={2} colSpan={5}><Button key={choiceData} onClick={getAnswer} value={choiceData}>回答:{choiceData}</Button></GridItem>
-              )
-            })}
+           {choicesData && <>
+            <GridItem rowSpan={2} colSpan={5}><Button onClick={getAnswer} value={choicesData[0]}>回答1:{choicesData[0]}</Button></GridItem>
+            <GridItem rowSpan={2} colSpan={5}><Button onClick={getAnswer} value={choicesData[1]}>回答2:{choicesData[1]}</Button></GridItem>
+            <GridItem rowSpan={2} colSpan={5}><Button onClick={getAnswer} value={choicesData[2]}>回答3:{choicesData[2]}</Button></GridItem>
+            <GridItem rowSpan={2} colSpan={5}><Button onClick={getAnswer} value={choicesData[3]}>回答4:{choicesData[3]}</Button></GridItem>
           </>}
         </Grid>
         <Stack>
@@ -239,7 +234,7 @@ const Fuga = () => {
         <Link href="/">
           <Box>戻る</Box>
         </Link>
-        {router.query.Name == user.Name &&
+        {userInPost.Name == user.Name &&
           <Menu>
             <MenuButton as={Button} h={10} p={2}>
               ...
@@ -256,10 +251,10 @@ const Fuga = () => {
             </MenuList>
           </Menu>}
         {userInPost.Posts[0].UserID == user.ID
-          ? <Button disabled>{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGooded : uiGooded}</Button>
+          ? <Button disabled>{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGoodedCount : uiGoodedCount}</Button>
           : isGooded == true
-            ? <Button onClick={() => { DeleteGoodFetch(), setIsGooded(false), setUiGooded(uiGooded - 1) }}><StarIcon color="gold" />いいねしました。{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGooded : uiGooded}</Button>
-            : <Button onClick={() => { GoodFetch(), setIsGooded(true), setUiGooded(uiGooded + 1) }} disabled={!user.ID} ><StarIcon />いいねする{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGooded : uiGooded}
+            ? <Button onClick={() => { DeleteGoodFetch(), setIsGooded(false), setUiGoodedCount(uiGoodedCount - 1) }}><StarIcon color="gold" />いいねしました。{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGoodedCount : uiGoodedCount}</Button>
+            : <Button onClick={() => { GoodFetch(), setIsGooded(true), setUiGoodedCount(uiGoodedCount + 1) }} disabled={!user.ID} ><StarIcon />いいねする{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGoodedCount : uiGoodedCount}
             {!user.ID && <>ログインしないといいねができません</>}</Button>
 
         }

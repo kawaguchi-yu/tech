@@ -80,10 +80,6 @@ func (controller *UserController) UpdateUser(c Context) (err error) {
 		fmt.Printf("Contextからuserを読めませんでした\n")
 		c.JSON(http.StatusBadRequest, "Contextからuserを読めませんでした")
 	}
-	if err := GuestUserCheck(user.ID); err != nil {
-		return c.JSON(http.StatusBadRequest, "GuestUserはユーザー情報を変更する権限がありません")
-	}
-	fmt.Printf("user=%v\n", user)
 	email, err := ReadCookieReturnEMail(c)
 	if err != nil {
 		fmt.Printf("Contextからemailを読めませんでした\n")
@@ -107,14 +103,6 @@ func (controller *UserController) SetIcon(c Context) (err error) {
 	if err != nil {
 		fmt.Printf("クッキー読み取りに失敗しました\n")
 		return c.JSON(http.StatusBadRequest, "クッキー読み取りに失敗しました")
-	}
-	user := domain.User{}
-	user, err = controller.Interactor.ReturnUserBYEMail(email)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "emailからuserを取得できませんでした")
-	}
-	if err := GuestUserCheck(user.ID); err != nil {
-		return c.JSON(http.StatusBadRequest, "GuestUserは変更権限がありません")
 	}
 	src, err := icon.Open() //io.Readerに変換
 	if err != nil {
