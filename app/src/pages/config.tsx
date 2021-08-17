@@ -143,17 +143,17 @@ const Config = () => {
 	}
 	return (<>
 		<Template />
-		{user.ID == guestuser && <Box bgColor="aquamarine">ゲストユーザーはアカウント情報を更新できません。</Box>}
+		{user.ID == guestuser && <Box bgColor="aquamarine">ゲストユーザーはアカウントを削除することができません。</Box>}
 		<Stack>
 			{view &&
 				<Image boxSize="300px" src={view} alt="select picture" />
 			}
 			<Stack>
-				<Input m="10" name="file" type='file' accept="image/*" onChange={onFileInputChange} disabled={user.ID == guestuser} />
+				<Input m="10" name="file" type='file' accept="image/*" onChange={onFileInputChange} />
 			</Stack>
 		</Stack>
 		<Stack>
-			<Button m="10" onClick={ApiFetch} disabled={user.ID == guestuser}>アイコンを変更する</Button>
+			<Button m="10" onClick={ApiFetch}　>アイコンを変更する</Button>
 			{posts &&
 				<Image boxSize="300px" src={(window.URL.createObjectURL(posts))} alt="select picture" />
 			}
@@ -161,7 +161,7 @@ const Config = () => {
 		{user && <Stack>
 			<FormControl onSubmit={handleSubmit(setData)}>
 				<FormLabel>名前を変更する</FormLabel>
-				<Input defaultValue={user.Name} {...register("name")} disabled={user.ID == guestuser} />
+				<Input defaultValue={user.Name} {...register("name")} />
 			</FormControl>
 			<FormControl onSubmit={handleSubmit(setData)}>
 				<FormLabel>自己紹介</FormLabel>
@@ -170,7 +170,7 @@ const Config = () => {
 						value: /^[^^＾"”'’;； 　#$%<>`*]+$/,
 						message: '特殊文字は使えません' // JS only: <p>error message</p> TS only support string
 					}
-				})} disabled={user.ID == guestuser} />
+				})}  />
 				{errors.essay && errors.essay.message}
 				<FormHelperText>200文字以内でお願いします</FormHelperText>
 			</FormControl>
@@ -180,7 +180,7 @@ const Config = () => {
 					<InputGroup>
 						<InputLeftAddon>https://twitter.com/</InputLeftAddon>
 						{user.Profile.URLs && <Input defaultValue={user.Profile.URLs[0].URL} {...register("url1")} />}
-						{!user.Profile.URLs && <Input {...register("url1")} disabled={user.ID == guestuser} />}
+						{!user.Profile.URLs && <Input {...register("url1")} />}
 					</InputGroup>
 				</FormControl>
 					<FormControl onSubmit={handleSubmit(setData)}>
@@ -188,13 +188,13 @@ const Config = () => {
 						<InputGroup>
 							<InputLeftAddon>https://github.com/</InputLeftAddon>
 							{user.Profile.URLs && <Input defaultValue={user.Profile.URLs[1].URL} {...register("url2")} />}
-							{!user.Profile.URLs && <Input {...register("url2")} disabled={user.ID == guestuser} />}
+							{!user.Profile.URLs && <Input {...register("url2")} />}
 						</InputGroup>
 					</FormControl></>}
 		</Stack>}
 		<Spacer />
 		<Stack m="10">
-			<Button onClick={updateUser} disabled={user.ID == guestuser}>アカウント情報を更新する</Button>
+			<Button onClick={updateUser} >アカウント情報を更新する</Button>
 			<Button onClick={DeleteFetch} disabled={user.ID == guestuser}>ユーザーを削除する</Button>
 		</Stack>
 	</>)

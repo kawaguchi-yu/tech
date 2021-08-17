@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState,useEffect } from "react"
 import { useForm } from "react-hook-form";
 import {
 	FormControl,
@@ -7,61 +7,117 @@ import {
 	HStack,
 	Stack,
 	Button,
+	Box,
 } from '@chakra-ui/react';
 import Template from "../template";
 import { useRouter } from 'next/router'
-type quizType = {
+type user = {
+  ID: number
+  CreatedAt: string
+  UpdatedAt: string
+  DeletedAt: string
+  Name: string
+  EMail: string
+  Password: string
+  Posts: post
+  Profile: string
+  ProfileID: string
+};
+type post = {
 	ID: number
 	UserID: number
-	title: string | string[]
-	answer: string | string[]
-	wrongAnswer1: string | string[]
-	wrongAnswer2: string | string[]
-	wrongAnswer3: string | string[]
-	explanation: string | string[]
-	Tags: tag[]
-	Goods: good[]
+	Title: string
+	Answer: string
+	WrongAnswer1: string
+	WrongAnswer2: string
+	WrongAnswer3: string
+	Explanation: string
 }
-type tag = {
-	Name: string
+const quizData: post = {
+	ID: 0,
+	UserID: 0,
+	Title: "",
+	Answer: "",
+	WrongAnswer1: "",
+	WrongAnswer2: "",
+	WrongAnswer3: "",
+	Explanation: "",
 }
-type good = {
-	ID: number
-}
-const quizData: quizType = {
-	ID: null,
-	UserID: null,
-	title: "",
-	answer: "",
-	wrongAnswer1: "",
-	wrongAnswer2: "",
-	wrongAnswer3: "",
-	explanation: "",
-	Tags: null,
-	Goods: null,
+type URLPath = {
+  UserID: number
 }
 const Posts = () => {
-	const { register, handleSubmit, formState, formState: { errors }, getValues } = useForm({
+	const { register, handleSubmit, formState, formState: { errors },setValue,getValues } = useForm({
 		mode: "onTouched",
 	});
-	const [posts, setPosts] = useState([])
+	const [URLQuery, setURLQuery] = useState<URLPath>()
 	const [randomAnswer, setRandomAnswer] = useState([])
 	const [answer, setAnswer] = useState<string>()
+	const [getPost,setGetpost] = useState<post>(quizData)
 	const router = useRouter();
+	useEffect(() => {
+    if (router.asPath !== router.route) {//厳密不等価
+      const queryID: URLPath = { UserID: Number(router.query.ID) }
+      setURLQuery(queryID);
+    }
+  }, [router])
+	useEffect(() => {
+    if (URLQuery) {
+			console.log("URLQuery",URLQuery)
+      fetch("http://localhost:8080/getuserbyid", {
+        mode: "cors",
+        method: "POST",
+        headers: { "Content-Type": "application/json", },
+        credentials: 'include',
+        body: JSON.stringify(URLQuery)
+      }).then((res) => res.json())
+        .then((data) => {
+          const result = JSON.stringify(data)
+          const result2: user = JSON.parse(result)
+          setGetpost(result2.Posts[0])
+          console.log("result",result2.Posts[0])
+				})
+    }
+  }, [URLQuery])
+	
+	const upDateFetch = () => {
+		setData()
+		fetch("http://localhost:8080/updatepost", {
+			mode: "cors",
+			method: "POST",
+			headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
+			credentials: 'include',
+			body: JSON.stringify(quizData),
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				console.log(data);
+			})
+			.catch((err) => { console.log(err) })
+	};
+	const setdata=()=>{
+		setValue("title",getPost.Title)
+		setValue("answer",getPost.Answer)
+		setValue("wrongAnswer1",getPost.WrongAnswer1)
+		setValue("wrongAnswer2",getPost.WrongAnswer2)
+		setValue("wrongAnswer3",getPost.WrongAnswer3)
+		setValue("explanation",getPost.Explanation)
+	}
+	setdata()
 	const setData = () => {
 		const hasData = getValues(["title", "answer", "wrongAnswer1", "wrongAnswer2", "wrongAnswer3", "explanation"])
-		quizData.ID = Number(router.query.ID)
-		quizData.UserID = Number(router.query.UserID)
-		quizData.title = hasData[0]
-		quizData.answer = hasData[1]
-		quizData.wrongAnswer1 = hasData[2]
-		quizData.wrongAnswer2 = hasData[3]
-		quizData.wrongAnswer3 = hasData[4]
-		quizData.explanation = hasData[5]
+		quizData.ID = getPost.ID
+		quizData.UserID = getPost.UserID
+		quizData.Title = hasData[0]
+		quizData.Answer = hasData[1]
+		quizData.WrongAnswer1 = hasData[2]
+		quizData.WrongAnswer2 = hasData[3]
+		quizData.WrongAnswer3 = hasData[4]
+		quizData.Explanation = hasData[5]
 		console.log(quizData)
 	}
 	const RandomAnswer = () => {
-		let answer = [quizData.answer, quizData.wrongAnswer1, quizData.wrongAnswer2, quizData.wrongAnswer3]
+		let answer = [quizData.Answer, quizData.WrongAnswer1, quizData.WrongAnswer2, quizData.WrongAnswer3]
 		for (let i = answer.length - 1; i > 0; i--) {
 			let j = Math.floor(Math.random() * (i + 1));
 			let tmp = answer[i];
@@ -75,27 +131,12 @@ const Posts = () => {
 		RandomAnswer()
 	}
 	const getAnswer = (event) => {
-		if (quizData.answer == event.target.value) {
+		if (quizData.Answer == event.target.value) {
 			setAnswer("正解！")
 		} else {
 			setAnswer("不正解！")
 		}
 	}
-	const upDateFetch = () => {
-		setData()
-		fetch("http://localhost:8080/updatepost", {
-			mode: "cors",
-			method: "POST",
-			headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
-			credentials: 'include',
-			body: JSON.stringify(quizData),
-		})
-			.then((res) => res.json())
-			.then((data) => {
-				setPosts(data);
-			})
-			.catch((err) => { console.log(err) })
-	};
 
 	return (<>
 		<Template />
@@ -104,7 +145,7 @@ const Posts = () => {
 			<FormLabel>問題文</FormLabel>
 			<Input
 				type="string"
-				defaultValue={router.query.Title}
+				defaultValue={getPost.Title}
 				placeholder="例:この中でフロントエンド言語はどれ？"
 				{...register("title", {
 					required: "タイトルを入力してください",
@@ -117,7 +158,7 @@ const Posts = () => {
 				<FormLabel>正答</FormLabel>
 				<Input
 					type="body"
-					defaultValue={router.query.Answer}
+					defaultValue={getPost.Answer}
 					placeholder="例:JavaScript"
 					{...register("answer", {
 						required: "回答を入力してください",
@@ -130,7 +171,7 @@ const Posts = () => {
 				<FormLabel>誤答</FormLabel>
 				<Input
 					type="body"
-					defaultValue={router.query.WrongAnswer1}
+					defaultValue={getPost.WrongAnswer1}
 					placeholder="例:Go"
 					{...register("wrongAnswer1", {
 						required: "回答を入力してください",
@@ -144,7 +185,7 @@ const Posts = () => {
 				<FormLabel>誤答</FormLabel>
 				<Input
 					type="body"
-					defaultValue={router.query.WrongAnswer2}
+					defaultValue={getPost.WrongAnswer2}
 					placeholder="例:PHP"
 					{...register("wrongAnswer2", {
 						required: "回答を入力してください",
@@ -158,7 +199,7 @@ const Posts = () => {
 				<FormLabel>誤答</FormLabel>
 				<Input
 					type="body"
-					defaultValue={router.query.WrongAnswer3}
+					defaultValue={getPost.WrongAnswer3}
 					placeholder="例:Ruby"
 					{...register("wrongAnswer3", {
 						required: "回答を入力してください",
@@ -172,7 +213,7 @@ const Posts = () => {
 				<FormLabel>解説文</FormLabel>
 				<Input
 					type="body"
-					defaultValue={router.query.Explanation}
+					defaultValue={getPost.Explanation}
 					placeholder="JavaScriptだけがフロントエンド言語だよ！"
 					{...register("explanation", {
 						required: "解説文を入力してください",
@@ -190,7 +231,7 @@ const Posts = () => {
 			<Button onClick={test}>プレビュー</Button>
 		</Stack>
 		<Stack>
-			<>問題文:{quizData.title}</>
+			<>問題文:{quizData.Title}</>
 		</Stack>
 		<HStack>
 			<Button onClick={getAnswer} value={randomAnswer[0]}>回答1:{randomAnswer[0]}</Button>
@@ -201,12 +242,11 @@ const Posts = () => {
 		</HStack>
 		<Stack>
 				<>{answer}</>
-				{answer && <>正解は{quizData.answer}です</>}
+				{answer && <>正解は<Box>{quizData.Answer}です</Box></>}
 			</Stack>
 		<Stack>
-			{answer && <>解説文 {quizData.explanation}</>}
+			{answer && <>解説<Box> {quizData.Explanation}</Box></>}
 		</Stack>
-		{JSON.stringify(posts)}
 	</>)
 }
 export default Posts

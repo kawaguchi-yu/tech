@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react"
 import { useRouter } from "next/router"
 import {
 	chakra,
-	Stack,
 	Box,
 	VStack,
 	HStack,
 	Image,
 	Grid,
 	GridItem,
+	Spacer,
+	Center,
 } from '@chakra-ui/react';
 import Link from "next/link";
 import Template from "./template";
@@ -21,10 +22,11 @@ type user = {
 	EMail: string
 	Password: string
 	Posts: post[]
-	Profile: string
+	Profile: Profile
 	ProfileID: string
 	Goods: string
 	Icon: string
+	IconBlob:Blob
 };
 type post = {
 	Name: string//userの名前を入れる
@@ -47,15 +49,20 @@ type good = {
 	UserId: number
 	PostID: number
 }
+type Profile ={
+	Essay: string
+	URLs: string
+}
 type URLPath = {
 	Name: string
 }
 const MyPages = (): JSX.Element => {
 	const router = useRouter()
 	const [URLQuery, setURLQuery] = useState<URLPath>()
+	const [user,setUser] = useState<user>()
 	const [postDatas, setPostDatas] = useState<post[]>([])
-	const [userId, setUserId] = useState<good>()
 	const [goodedPostDatas, setGoodedPostDatas] = useState<post[]>([])
+	const [userId, setUserId] = useState<good>()
 	useEffect(() => {
 		if (router.asPath !== router.route) {//厳密不等価
 			const queryname: URLPath = { Name: String(router.query.name) }
@@ -73,7 +80,6 @@ const MyPages = (): JSX.Element => {
 			}).then((res) => res.json())
 				.then((datas) => {
 					const userData: user = datas
-					console.log("貰ってきたデータ", userData)
 					let bin = atob(userData.Icon.replace(/^.*,/, ''));
 					let buffer = new Uint8Array(bin.length);
 					for (let i = 0; i < bin.length; i++) {
@@ -81,11 +87,13 @@ const MyPages = (): JSX.Element => {
 					} let blob = new Blob([buffer.buffer], {
 						type: "image/jpeg"
 					});
+					userData.IconBlob = blob
 					userData.Posts.forEach(postData => {
 						postData.Name = userData.Name
 						postData.Icon = blob
 					})
 					console.log("貰ってきたデータ", datas)
+					setUser(userData)
 					setPostDatas(userData.Posts)
 					setUserId({ ID: 0, PostID: 0, UserId: userData.ID })
 				})
@@ -124,7 +132,6 @@ const MyPages = (): JSX.Element => {
 								returnPostDatas = [...returnPostDatas, postData]
 							}
 						})
-						console.log("貰ってきたデータ222222222222", datas)
 					})
 					setGoodedPostDatas(returnPostDatas)
 				})
@@ -141,7 +148,7 @@ const MyPages = (): JSX.Element => {
 						<Image boxSize="50px"
 							borderRadius="full"
 							src={(window.URL.createObjectURL(postData.Icon))}
-							alt="select picture" />
+							alt="userIcon" />
 						{postData.Goods ? <Box>いいね数:{postData.Goods.length}</Box> : <Box>いいね数:0</Box>}
 						<Box>{postData.Name}が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
 						<Link
@@ -158,13 +165,13 @@ const MyPages = (): JSX.Element => {
 	const GoodedView = () => {
 		return (<>
 			{goodedPostDatas.map((goodedPostData) => {
-				console.log("goodedpostdatas", goodedPostData)
+				console.log("goodedpostdatas", "aaaaa")
 				return (
 					<VStack key={goodedPostData.ID} padding="10" bg="white"boxShadow="xs">
 						<Image boxSize="50px"
 							borderRadius="full"
 							src={(window.URL.createObjectURL(goodedPostData.Icon))}
-							alt="select picture" />
+							alt="userIcon" />
 						{goodedPostData.Goods ? <Box>いいね数:{goodedPostData.Goods.length}</Box> : <Box>いいね数:0</Box>}
 						<Box><Link href={`/${goodedPostData.Name}`}>{goodedPostData.Name}</Link>が{goodedPostData.CreatedAt.substring(0, 10)}に投稿しました</Box>
 						<Link
@@ -182,8 +189,17 @@ const MyPages = (): JSX.Element => {
 		<>
 			<Template />
 			<chakra.div>
-				<Link href="/config">プロフィールを編集する</Link>
 				<HStack align="center" p="10">
+					<Box align="center">
+					{user&&<Image boxSize="50px"
+							borderRadius="full"
+							src={(window.URL.createObjectURL(user.IconBlob))}
+							alt="userIcon" />}
+					{user&&user.Name}
+					</Box>
+					<Box margin={2}>
+						{user&&user.Profile.Essay}
+					</Box>
 				</HStack>
 				<Grid
 					h="200px"

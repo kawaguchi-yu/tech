@@ -118,9 +118,9 @@ const Template = () => {
 						{user
 							? <>
 								<Menu>
-									<MenuButton as={Button} h={16} p={2}>
-										{user.IconBlob && <Image boxSize="50px"
-											borderRadius="full"
+									<MenuButton as={Button} h={16} p={2} rounded="full">
+										{user.IconBlob && <Image										
+											boxSize="50px"									
 											src={(window.URL.createObjectURL(user.IconBlob))}
 											alt="select picture" />}
 									</MenuButton>

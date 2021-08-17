@@ -12,7 +12,7 @@ import (
 func GuestUserCheck(userID uint) error {
 	const GuestUser = 30
 	if userID == GuestUser {
-		return errors.New("GuestUserはユーザー情報を変更する権限がありません")
+		return errors.New("GuestUserはユーザーを削除する権限がありません")
 	}
 	return nil
 }
