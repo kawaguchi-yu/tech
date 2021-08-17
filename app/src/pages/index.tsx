@@ -119,8 +119,7 @@ const Home = (): JSX.Element => {
 					margin={5}
 					gap={2}
 				>
-					<GridItem rowSpan={2} colSpan={1}>いいね順に並び変える</GridItem>
-					<GridItem rowSpan={2} colSpan={4} align="center">皆が投稿したクイズ一覧<PostsView /></GridItem>
+					<GridItem rowSpan={2} colSpan={5} align="center">皆が投稿したクイズ一覧<PostsView /></GridItem>
 					</Grid>
 				</Stack>
 			</chakra.div>
