@@ -29,6 +29,31 @@ type user = {
 	Icon: string
 	IconBlob: Blob
 };
+const SearchFunc = () => {
+	const router = useRouter()
+	const [word, setWord] = useState<string>();
+	const Search = () => {
+		if (!word) {
+			return;
+		}
+		router.push({
+			pathname: `/search/`,
+			query: { word }
+		})
+	}
+	return (<>
+		<Input h={10} w={500}
+			value={word}
+			onChange={(e) => setWord(e.target.value)}
+		>
+		</Input>
+		<Button
+			onClick={Search}
+			disabled={!word}>
+			偏移
+		</Button>
+	</>)
+}
 const Template = () => {
 	const router = useRouter()
 	const [user, setUser] = useState<user>();
@@ -77,16 +102,7 @@ const Template = () => {
 				router.reload()
 			})
 	}
-	const [word,setWord] = useState<string>();
-	const Search = () => {
-		if (!word){
-		return;
-	}
-	router.push({
-		pathname: `/search/`,
-		query: {word}
-	})
-}
+
 	return (
 		<>
 			<Flex bg={useColorModeValue("blue.100", 'gray.900')} alignItems={'center'}>
@@ -95,22 +111,12 @@ const Template = () => {
 						<Heading>Techer</Heading>
 					</Box>
 				</Link>
-				<Input
-				value={word}
-				onChange={(e)=> setWord(e.target.value)}
-				>
-				</Input>
-				<Button
-				onClick={Search}
-				disabled={!word}>
-					偏移
-				</Button>
+				<SearchFunc />
 				<Spacer />
 				<Box mr={4}>
 					<Flex direction="row" align="center">
 						{user
-							? <><Heading mr="4">welcome!{user.Name}</Heading>
-								<Spacer />
+							? <>
 								<Menu>
 									<MenuButton as={Button} h={16} p={2}>
 										{user.IconBlob && <Image boxSize="50px"

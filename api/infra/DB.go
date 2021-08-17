@@ -2,17 +2,13 @@ package infra
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"hello/server/domain"
 	"hello/server/interfaces/database"
-	"io"
 	"os"
 	"time"
 
 	"github.com/joho/godotenv"
-	"github.com/labstack/echo/v4"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -104,28 +100,4 @@ func (handler *SqlHandler) Model(value interface{}) *gorm.DB {
 }
 func (handler *SqlHandler) Save(value interface{}) *gorm.DB {
 	return handler.Conn.Save(value)
-}
-
-func GetUserModel(b io.ReadCloser) (domain.User, error) {
-	var jsonData = make(map[string]string) //空っぽのmapを作る
-	var user domain.User
-	//デコードしてio.Reader型に変換する
-	if err := json.NewDecoder(b).Decode(&jsonData); err != nil {
-		return user, echo.ErrBadRequest
-	}
-	if jsonData == nil {
-		return user, echo.ErrInternalServerError
-	}
-	name := jsonData["Name"]
-	eMail := jsonData["EMail"]
-	rawPassword := []byte(jsonData["Password"])
-	//bcryptでハッシュ化したパスワードをhashedPasswordに入れる
-	hashedPassword, err := bcrypt.GenerateFromPassword(rawPassword, 4)
-	if err != nil {
-		return user, echo.ErrBadRequest
-	}
-	user.Name = name
-	user.EMail = eMail
-	user.Password = string(hashedPassword)
-	return user, nil
 }

@@ -11,11 +11,6 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 )
 
-// func newDummyHandler(db *gorm.DB) database.SqlHandler {
-// 	sqlHandler := new(SqlHandler)
-// 	sqlHandler.Conn = db
-// 	return sqlHandler
-// }
 func TestCreate(t *testing.T) {
 	body := GetCreateUser() //tanaka情報をbodyに代入
 	db, mock, err := testdata.GetMockDB()
@@ -129,13 +124,3 @@ func GetCreateUser() *domain.User {
 	}
 	return body
 }
-
-// func TestGetUserModel(t *testing.T) {
-// 	body := GetCreateUser()                  //tanaka情報をbodyに入れる
-// 	jsonBody, err := json.Marshal(&body)     //jsonへと変換する
-// 	assert.Nil(t, err)                       //nilかどうかをテスト
-// 	r := strings.NewReader(string(jsonBody)) //stringのt情報を
-// 	readCloser := ioutil.NopCloser(r)        //io.ReadCloserインターフェースCloseを満たすオブジェクトを返す
-// 	_, errUser := GetUserModel(readCloser)   //
-// 	assert.Nil(t, errUser)                   //nilかどうかをテスト
-// }
