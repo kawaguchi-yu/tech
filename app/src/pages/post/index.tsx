@@ -87,7 +87,11 @@ const Posts = () => {
 				type="string"
 				placeholder="例:この中でフロントエンド言語はどれ？"
 				{...register("title", {
-					required: "タイトルを入力してください",
+					required: true,
+					pattern: {
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+					}
 				})}
 			/>
 			{errors.title && errors.title.message}
@@ -99,7 +103,11 @@ const Posts = () => {
 					type="body"
 					placeholder="例:JavaScript"
 					{...register("answer", {
-						required: "回答を入力してください",
+						required: true,
+						pattern: {
+							value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+							message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+						}
 					})}
 				/>
 				{errors.answer && errors.answer.message}
@@ -112,7 +120,11 @@ const Posts = () => {
 					type="body"
 					placeholder="例:Go"
 					{...register("wrongAnswer1", {
-						required: "回答を入力してください",
+						required: true,
+						pattern: {
+							value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+							message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+						}
 					})}
 				/>
 				{errors.wrongAnswer1 && errors.wrongAnswer1.message}
@@ -125,7 +137,11 @@ const Posts = () => {
 					type="body"
 					placeholder="例:PHP"
 					{...register("wrongAnswer2", {
-						required: "回答を入力してください",
+						required: true,
+					pattern: {
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+					}
 					})}
 				/>
 				{errors.wrongAnswer2 && errors.wrongAnswer2.message}
@@ -138,7 +154,11 @@ const Posts = () => {
 					type="body"
 					placeholder="例:Ruby"
 					{...register("wrongAnswer3", {
-						required: "回答を入力してください",
+						required: true,
+					pattern: {
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+					}
 					})}
 				/>
 				{errors.wrongAnswer3 && errors.wrongAnswer3.message}
@@ -151,7 +171,11 @@ const Posts = () => {
 					type="body"
 					placeholder="JavaScriptだけがフロントエンド言語だよ！"
 					{...register("explanation", {
-						required: "解説文を入力してください",
+						required: true,
+						pattern: {
+							value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+							message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+						}
 					})}
 				/>
 				{errors.explanation && errors.explanation.message}

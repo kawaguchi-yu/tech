@@ -134,7 +134,7 @@ const Template = () => {
 		<>
 			<Flex bg={useColorModeValue("blue.100", 'gray.900')} alignItems={'center'}>
 				<Link href="/">
-					<Box h={16} p={2} color="Highlight">
+					<Box height={16} p={2} color="Highlight">
 						<Heading>Techer</Heading>
 					</Box>
 				</Link>
@@ -145,7 +145,7 @@ const Template = () => {
 						{user
 							? <>
 								<Menu>
-									<MenuButton as={Button} h={16} p={2} rounded="full">
+									<MenuButton as={Button} height={16} width={16} p={2} rounded="full">
 										{user.IconBlob && <Image
 											boxSize="50px"
 											src={(window.URL.createObjectURL(user.IconBlob))}
