@@ -78,6 +78,10 @@ const View = () => {
               maxLength: {
                 value: 15,
                 message: '15文字以内で入力してください' // JS only: <p>error message</p> TS only support string
+              },
+              pattern: {
+                value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+                message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
               }
             })}
           />

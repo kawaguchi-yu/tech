@@ -1,8 +1,9 @@
-import React, { useState,useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { useForm } from "react-hook-form";
 import {
 	FormControl,
 	FormLabel,
+	useToast,
 	Input,
 	HStack,
 	Stack,
@@ -12,16 +13,16 @@ import {
 import Template from "../template";
 import { useRouter } from 'next/router'
 type user = {
-  ID: number
-  CreatedAt: string
-  UpdatedAt: string
-  DeletedAt: string
-  Name: string
-  EMail: string
-  Password: string
-  Posts: post
-  Profile: string
-  ProfileID: string
+	ID: number
+	CreatedAt: string
+	UpdatedAt: string
+	DeletedAt: string
+	Name: string
+	EMail: string
+	Password: string
+	Posts: post
+	Profile: string
+	ProfileID: string
 };
 type post = {
 	ID: number
@@ -44,42 +45,44 @@ const quizData: post = {
 	Explanation: "",
 }
 type URLPath = {
-  UserID: number
+	UserID: number
 }
 const Posts = () => {
-	const { register, handleSubmit, formState, formState: { errors },setValue,getValues } = useForm({
+	const { register, handleSubmit, formState, formState: { errors }, setValue, getValues } = useForm({
 		mode: "onTouched",
 	});
 	const [URLQuery, setURLQuery] = useState<URLPath>()
 	const [randomAnswer, setRandomAnswer] = useState([])
 	const [answer, setAnswer] = useState<string>()
-	const [getPost,setGetpost] = useState<post>(quizData)
+	const [getPost, setGetpost] = useState<post>(quizData)
 	const router = useRouter();
+	const toast = useToast()
 	useEffect(() => {
-    if (router.asPath !== router.route) {//厳密不等価
-      const queryID: URLPath = { UserID: Number(router.query.ID) }
-      setURLQuery(queryID);
-    }
-  }, [router])
+		if (router.asPath !== router.route) {//厳密不等価
+			const queryID: URLPath = { UserID: Number(router.query.ID) }
+			setURLQuery(queryID);
+		}
+	}, [router])
 	useEffect(() => {
-    if (URLQuery) {
-			console.log("URLQuery",URLQuery)
-      fetch("http://localhost:8080/getuserbyid", {
-        mode: "cors",
-        method: "POST",
-        headers: { "Content-Type": "application/json", },
-        credentials: 'include',
-        body: JSON.stringify(URLQuery)
-      }).then((res) => res.json())
-        .then((data) => {
-          const result = JSON.stringify(data)
-          const result2: user = JSON.parse(result)
-          setGetpost(result2.Posts[0])
-          console.log("result",result2.Posts[0])
+		if (URLQuery) {
+			console.log("URLQuery", URLQuery)
+			fetch("http://localhost:8080/getuserbyid", {
+				mode: "cors",
+				method: "POST",
+				headers: { "Content-Type": "application/json", },
+				credentials: 'include',
+				body: JSON.stringify(URLQuery)
+			}).then((res) => res.json())
+				.then((data) => {
+					const result = JSON.stringify(data)
+					const result2: user = JSON.parse(result)
+					setGetpost(result2.Posts[0])
+					setFetchData(result2.Posts[0])
+					console.log("result", result2.Posts[0])
 				})
-    }
-  }, [URLQuery])
-	
+		}
+	}, [URLQuery])
+
 	const upDateFetch = () => {
 		setData()
 		fetch("http://localhost:8080/updatepost", {
@@ -92,18 +95,24 @@ const Posts = () => {
 			.then((res) => res.json())
 			.then((data) => {
 				console.log(data);
+				toast({
+					title: "記事を更新しました！",
+					description: "正常に記事が更新されました。",
+					status: "success",
+					duration: 9000,
+					isClosable: true,
+				})
 			})
 			.catch((err) => { console.log(err) })
 	};
-	const setdata=()=>{
-		setValue("title",getPost.Title)
-		setValue("answer",getPost.Answer)
-		setValue("wrongAnswer1",getPost.WrongAnswer1)
-		setValue("wrongAnswer2",getPost.WrongAnswer2)
-		setValue("wrongAnswer3",getPost.WrongAnswer3)
-		setValue("explanation",getPost.Explanation)
+	const setFetchData = (postData) => {
+		setValue("title", postData.Title)
+		setValue("answer", postData.Answer)
+		setValue("wrongAnswer1", postData.WrongAnswer1)
+		setValue("wrongAnswer2", postData.WrongAnswer2)
+		setValue("wrongAnswer3", postData.WrongAnswer3)
+		setValue("explanation", postData.Explanation)
 	}
-	setdata()
 	const setData = () => {
 		const hasData = getValues(["title", "answer", "wrongAnswer1", "wrongAnswer2", "wrongAnswer3", "explanation"])
 		quizData.ID = getPost.ID
@@ -148,65 +157,85 @@ const Posts = () => {
 				defaultValue={getPost.Title}
 				placeholder="例:この中でフロントエンド言語はどれ？"
 				{...register("title", {
-					required: "タイトルを入力してください",
+					required: true,
+					pattern: {
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+					}
 				})}
 			/>
 			{errors.title && errors.title.message}
 		</FormControl>
-			<FormControl onSubmit={handleSubmit(setData)}
-				isInvalid={errors.answer ? true : false}>
-				<FormLabel>正答</FormLabel>
-				<Input
-					type="body"
-					defaultValue={getPost.Answer}
-					placeholder="例:JavaScript"
-					{...register("answer", {
-						required: "回答を入力してください",
-					})}
-				/>
-				{errors.answer && errors.answer.message}
-			</FormControl>
-			<FormControl onSubmit={handleSubmit(setData)}
-				isInvalid={errors.wrongAnswer1 ? true : false}>
-				<FormLabel>誤答</FormLabel>
-				<Input
-					type="body"
-					defaultValue={getPost.WrongAnswer1}
-					placeholder="例:Go"
-					{...register("wrongAnswer1", {
-						required: "回答を入力してください",
-					})}
-				/>
-				{errors.wrongAnswer1 && errors.wrongAnswer1.message}
-			</FormControl>
+		<FormControl onSubmit={handleSubmit(setData)}
+			isInvalid={errors.answer ? true : false}>
+			<FormLabel>正答</FormLabel>
+			<Input
+				type="body"
+				defaultValue={getPost.Answer}
+				placeholder="例:JavaScript"
+				{...register("answer", {
+					required: true,
+					pattern: {
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+					}
+				})}
+			/>
+			{errors.answer && errors.answer.message}
+		</FormControl>
+		<FormControl onSubmit={handleSubmit(setData)}
+			isInvalid={errors.wrongAnswer1 ? true : false}>
+			<FormLabel>誤答</FormLabel>
+			<Input
+				type="body"
+				defaultValue={getPost.WrongAnswer1}
+				placeholder="例:Go"
+				{...register("wrongAnswer1", {
+					required: true,
+					pattern: {
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+					}
+				})}
+			/>
+			{errors.wrongAnswer1 && errors.wrongAnswer1.message}
+		</FormControl>
 
-			<FormControl onSubmit={handleSubmit(setData)}
-				isInvalid={errors.wrongAnswer2 ? true : false}>
-				<FormLabel>誤答</FormLabel>
-				<Input
-					type="body"
-					defaultValue={getPost.WrongAnswer2}
-					placeholder="例:PHP"
-					{...register("wrongAnswer2", {
-						required: "回答を入力してください",
-					})}
-				/>
-				{errors.wrongAnswer2 && errors.wrongAnswer2.message}
-			</FormControl>
+		<FormControl onSubmit={handleSubmit(setData)}
+			isInvalid={errors.wrongAnswer2 ? true : false}>
+			<FormLabel>誤答</FormLabel>
+			<Input
+				type="body"
+				defaultValue={getPost.WrongAnswer2}
+				placeholder="例:PHP"
+				{...register("wrongAnswer2", {
+					required: true,
+					pattern: {
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+					}
+				})}
+			/>
+			{errors.wrongAnswer2 && errors.wrongAnswer2.message}
+		</FormControl>
 
-			<FormControl onSubmit={handleSubmit(setData)}
-				isInvalid={errors.wrongAnswer3 ? true : false}>
-				<FormLabel>誤答</FormLabel>
-				<Input
-					type="body"
-					defaultValue={getPost.WrongAnswer3}
-					placeholder="例:Ruby"
-					{...register("wrongAnswer3", {
-						required: "回答を入力してください",
-					})}
-				/>
-				{errors.wrongAnswer3 && errors.wrongAnswer3.message}
-			</FormControl>
+		<FormControl onSubmit={handleSubmit(setData)}
+			isInvalid={errors.wrongAnswer3 ? true : false}>
+			<FormLabel>誤答</FormLabel>
+			<Input
+				type="body"
+				defaultValue={getPost.WrongAnswer3}
+				placeholder="例:Ruby"
+				{...register("wrongAnswer3", {
+					required: true,
+					pattern: {
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+					}
+				})}
+			/>
+			{errors.wrongAnswer3 && errors.wrongAnswer3.message}
+		</FormControl>
 		<Stack>
 			<FormControl onSubmit={handleSubmit(setData)}
 				isInvalid={errors.explanation ? true : false}>
@@ -216,7 +245,11 @@ const Posts = () => {
 					defaultValue={getPost.Explanation}
 					placeholder="JavaScriptだけがフロントエンド言語だよ！"
 					{...register("explanation", {
-						required: "解説文を入力してください",
+						required: true,
+						pattern: {
+							value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+							message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+						}
 					})}
 				/>
 				{errors.explanation && errors.explanation.message}
@@ -238,12 +271,12 @@ const Posts = () => {
 			<Button onClick={getAnswer} value={randomAnswer[1]}>回答2:{randomAnswer[1]}</Button>
 			<Button onClick={getAnswer} value={randomAnswer[2]}>回答3:{randomAnswer[2]}</Button>
 			<Button onClick={getAnswer} value={randomAnswer[3]}>回答4:{randomAnswer[3]}</Button>
-			
+
 		</HStack>
 		<Stack>
-				<>{answer}</>
-				{answer && <>正解は<Box>{quizData.Answer}です</Box></>}
-			</Stack>
+			<>{answer}</>
+			{answer && <>正解は<Box>{quizData.Answer}です</Box></>}
+		</Stack>
 		<Stack>
 			{answer && <>解説<Box> {quizData.Explanation}</Box></>}
 		</Stack>
