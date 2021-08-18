@@ -166,11 +166,12 @@ const Config = () => {
 			<FormControl onSubmit={handleSubmit(setData)}>
 				<FormLabel>自己紹介</FormLabel>
 				<Input defaultValue={user.Profile.Essay} {...register("essay", {
+					required: true,
 					pattern: {
-						value: /^[^^＾"”'’;； 　#$%<>`*]+$/,
-						message: '特殊文字は使えません' // JS only: <p>error message</p> TS only support string
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,200}$/,
+						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
 					}
-				})}  />
+				})} />
 				{errors.essay && errors.essay.message}
 				<FormHelperText>200文字以内でお願いします</FormHelperText>
 			</FormControl>
@@ -180,7 +181,13 @@ const Config = () => {
 					<InputGroup>
 						<InputLeftAddon>https://twitter.com/</InputLeftAddon>
 						{user.Profile.URLs && <Input defaultValue={user.Profile.URLs[0].URL} {...register("url1")} />}
-						{!user.Profile.URLs && <Input {...register("url1")} />}
+						{!user.Profile.URLs && <Input {...register("url1", {
+							required: true,
+							pattern: {
+								value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,100}$/,
+								message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+							}
+						})} />}
 					</InputGroup>
 				</FormControl>
 					<FormControl onSubmit={handleSubmit(setData)}>
@@ -188,7 +195,13 @@ const Config = () => {
 						<InputGroup>
 							<InputLeftAddon>https://github.com/</InputLeftAddon>
 							{user.Profile.URLs && <Input defaultValue={user.Profile.URLs[1].URL} {...register("url2")} />}
-							{!user.Profile.URLs && <Input {...register("url2")} />}
+							{!user.Profile.URLs && <Input {...register("url2", {
+								required: true,
+								pattern: {
+									value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,100}$/,
+									message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+								}
+							})} />}
 						</InputGroup>
 					</FormControl></>}
 		</Stack>}

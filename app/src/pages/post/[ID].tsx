@@ -95,6 +95,16 @@ const Posts = () => {
 			.then((res) => res.json())
 			.then((data) => {
 				console.log(data);
+				if(data!="正常に終了しました"){
+					toast({
+						title: "エラーが発生しました",
+						description: "編集権限がありません",
+						status: "error",
+						duration: 9000,
+						isClosable: true,
+					})
+					return
+				}
 				toast({
 					title: "記事を更新しました！",
 					description: "正常に記事が更新されました。",
@@ -159,7 +169,7 @@ const Posts = () => {
 				{...register("title", {
 					required: true,
 					pattern: {
-						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,200}$/,
 						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
 					}
 				})}
@@ -176,7 +186,7 @@ const Posts = () => {
 				{...register("answer", {
 					required: true,
 					pattern: {
-						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,200}$/,
 						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
 					}
 				})}
@@ -193,7 +203,7 @@ const Posts = () => {
 				{...register("wrongAnswer1", {
 					required: true,
 					pattern: {
-						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,200}$/,
 						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
 					}
 				})}
@@ -211,7 +221,7 @@ const Posts = () => {
 				{...register("wrongAnswer2", {
 					required: true,
 					pattern: {
-						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,200}$/,
 						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
 					}
 				})}
@@ -229,7 +239,7 @@ const Posts = () => {
 				{...register("wrongAnswer3", {
 					required: true,
 					pattern: {
-						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,200}$/,
 						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
 					}
 				})}
@@ -247,7 +257,7 @@ const Posts = () => {
 					{...register("explanation", {
 						required: true,
 						pattern: {
-							value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
+							value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,200}$/,
 							message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
 						}
 					})}

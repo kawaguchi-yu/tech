@@ -251,7 +251,7 @@ const Fuga = () => {
             </MenuList>
           </Menu>}
         {userInPost.Posts[0].UserID == user.ID
-          ? <Button disabled>{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGoodedCount : uiGoodedCount}</Button>
+          ? <Button disabled><StarIcon />いいね数{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGoodedCount : uiGoodedCount}</Button>
           : isGooded == true
             ? <Button onClick={() => { DeleteGoodFetch(), setIsGooded(false), setUiGoodedCount(uiGoodedCount - 1) }}><StarIcon color="gold" />いいねしました。{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGoodedCount : uiGoodedCount}</Button>
             : <Button onClick={() => { GoodFetch(), setIsGooded(true), setUiGoodedCount(uiGoodedCount + 1) }} disabled={!user.ID} ><StarIcon />いいねする{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGoodedCount : uiGoodedCount}
