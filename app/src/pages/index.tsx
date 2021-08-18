@@ -93,7 +93,7 @@ const Home = (): JSX.Element => {
 							borderRadius="full"
 							src={(window.URL.createObjectURL(postData.Icon))}
 							alt="select picture" />
-						<Box bgColor="aquamarine"><Link href={`/${postData.Name}`}>{postData.Name}</Link>が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
+						<Box><Link href={`/${postData.Name}`}>{postData.Name}</Link>が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
 						<NextLink
 							as={`/items/${postData.ID}`}
 							href={{ pathname: `/items/[ID]`, query: userInfo }}

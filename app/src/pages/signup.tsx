@@ -73,15 +73,15 @@ const View = () => {
               required: true,
               minLength: {
                 value: 0,
-                message: '名前を入力してください' // JS only: <p>error message</p> TS only support string
+                message: '名前を入力してください'
               },
               maxLength: {
                 value: 15,
-                message: '15文字以内で入力してください' // JS only: <p>error message</p> TS only support string
+                message: '15文字以内で入力してください'
               },
               pattern: {
-                value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,20}$/,
-                message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+                value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]+$/,
+                message: '特殊文字を使用しないでください'
               }
             })}
           />
@@ -97,7 +97,7 @@ const View = () => {
             {...register("EMail", {
               required: "EMailを入力してください",
               pattern: {
-                value: /^[a-zA-Z0-9_+-]+(.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/,
+                value: /^[a-zA-Z0-9_+-]+(.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,50}$/,
                 message: 'メールアドレスを入力してください' // JS only: <p>error message</p> TS only support string
               },
             })}

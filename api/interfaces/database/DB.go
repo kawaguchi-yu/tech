@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"fmt"
 	"hello/server/domain"
 )
@@ -225,7 +226,7 @@ func (db *UserRepository) UpdatePost(email string, post *domain.Post) (err error
 		fmt.Printf("postの%vをアップデートしました\n", post.ID)
 	} else {
 		fmt.Printf("編集権限がありませんuser.ID=%vpost.UserID=%v\n", user.ID, post.UserID)
-		return nil
+		return errors.New("編集権限がありません")
 	}
 	return nil
 }
