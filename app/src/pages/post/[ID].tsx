@@ -5,9 +5,11 @@ import {
 	FormLabel,
 	useToast,
 	Input,
+	VStack,
 	HStack,
 	Stack,
 	Button,
+	Container,
 	Box,
 } from '@chakra-ui/react';
 import Template from "../template";
@@ -270,19 +272,16 @@ const Posts = () => {
 			onClick={upDateFetch}
 			disabled={!formState.isValid}
 		>更新</Button>
-		<Stack>
 			<Button onClick={test}>プレビュー</Button>
-		</Stack>
 		<Stack>
 			<>問題文:{quizData.Title}</>
 		</Stack>
-		<HStack>
-			<Button onClick={getAnswer} value={randomAnswer[0]}>回答1:{randomAnswer[0]}</Button>
-			<Button onClick={getAnswer} value={randomAnswer[1]}>回答2:{randomAnswer[1]}</Button>
-			<Button onClick={getAnswer} value={randomAnswer[2]}>回答3:{randomAnswer[2]}</Button>
-			<Button onClick={getAnswer} value={randomAnswer[3]}>回答4:{randomAnswer[3]}</Button>
-
-		</HStack>
+		<VStack>
+		<Container>回答1:{randomAnswer[0]}<Button margin="2" onClick={getAnswer} value={randomAnswer[0]}>これにする</Button></Container>
+		<Container>回答2:{randomAnswer[1]}<Button margin="2" onClick={getAnswer} value={randomAnswer[1]}>これにする</Button></Container>
+		<Container>回答3:{randomAnswer[2]}<Button margin="2" onClick={getAnswer} value={randomAnswer[2]}>これにする</Button></Container>
+		<Container>回答4:{randomAnswer[3]}<Button margin="2" onClick={getAnswer} value={randomAnswer[3]}>これにする</Button></Container>
+		</VStack>
 		<Stack>
 			<>{answer}</>
 			{answer && <>正解は<Box>{quizData.Answer}です</Box></>}

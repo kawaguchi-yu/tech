@@ -144,7 +144,7 @@ const MyPages = (): JSX.Element => {
 		return (<>
 			{postDatas.map((postData) => {
 				return (
-					<VStack key={postData.ID} padding="10" bg="white" boxShadow="xs">
+					<VStack key={postData.ID} padding="2" bg="white" boxShadow="xs">
 						<Image boxSize="50px"
 							borderRadius="full"
 							src={(window.URL.createObjectURL(postData.Icon))}
@@ -165,9 +165,8 @@ const MyPages = (): JSX.Element => {
 	const GoodedView = () => {
 		return (<>
 			{goodedPostDatas.map((goodedPostData) => {
-				console.log("goodedpostdatas", "aaaaa")
 				return (
-					<VStack key={goodedPostData.ID} padding="10" bg="white"boxShadow="xs">
+					<VStack key={goodedPostData.ID} padding="2" bg="white"boxShadow="xs">
 						<Image boxSize="50px"
 							borderRadius="full"
 							src={(window.URL.createObjectURL(goodedPostData.Icon))}
@@ -205,7 +204,7 @@ const MyPages = (): JSX.Element => {
 					h="200px"
 					templateRows="repeat(3, 1fr)"
 					templateColumns="repeat(2, 1fr)"
-					margin={5}
+					margin={2}
 					gap={2}
 				>
 					<GridItem rowSpan={2}>{URLQuery && URLQuery.Name}の投稿したクイズ一覧<PostsView /></GridItem>

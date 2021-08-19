@@ -155,7 +155,6 @@ func (db *UserRepository) ReturnGoodedPostByWord(word string) (returnUsers []dom
 	var users []domain.User
 	var posts []domain.Post
 	var goods []domain.Good
-	var userID []uint
 	var postId []uint
 	if err := db.Find(&posts, "title LIKE ?", "%"+word+"%").Error; err != nil {
 		return nil, nil, nil, err
@@ -166,10 +165,7 @@ func (db *UserRepository) ReturnGoodedPostByWord(word string) (returnUsers []dom
 	if err := db.Find(&users, postId).Error; err != nil {
 		return nil, nil, nil, err
 	}
-	for _, user := range users {
-		userID = append(userID, user.ID)
-	}
-	if err := db.Where("user_id in ?", userID).Find(&goods).Error; err != nil {
+	if err := db.Find(&goods).Error; err != nil {
 		return nil, nil, nil, err
 	}
 	return users, posts, goods, nil
@@ -182,7 +178,6 @@ func (db *UserRepository) ReturnGoodedPost(userID uint) (returnUsers []domain.Us
 		return nil, nil, nil, err
 	}
 	if len(goods) == 0 {
-		fmt.Printf("goodsはありませんでした\n")
 		return nil, nil, nil, err
 	}
 	var goodId []uint

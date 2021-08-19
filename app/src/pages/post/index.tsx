@@ -4,7 +4,8 @@ import {
 	FormControl,
 	FormLabel,
 	Input,
-	HStack,
+	VStack,
+	Container,
 	Stack,
 	Button,
 } from '@chakra-ui/react';
@@ -96,73 +97,73 @@ const Posts = () => {
 			/>
 			{errors.title && errors.title.message}
 		</FormControl>
-			<FormControl onSubmit={handleSubmit(setData)}
-				isInvalid={errors.answer ? true : false}>
-				<FormLabel>正答</FormLabel>
-				<Input
-					type="body"
-					placeholder="例:JavaScript"
-					{...register("answer", {
-						required: true,
-						pattern: {
-							value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,200}$/,
-							message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
-						}
-					})}
-				/>
-				{errors.answer && errors.answer.message}
-			</FormControl>
-
-			<FormControl onSubmit={handleSubmit(setData)}
-				isInvalid={errors.wrongAnswer1 ? true : false}>
-				<FormLabel>誤答</FormLabel>
-				<Input
-					type="body"
-					placeholder="例:Go"
-					{...register("wrongAnswer1", {
-						required: true,
-						pattern: {
-							value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,200}$/,
-							message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
-						}
-					})}
-				/>
-				{errors.wrongAnswer1 && errors.wrongAnswer1.message}
-			</FormControl>
-
-			<FormControl onSubmit={handleSubmit(setData)}
-				isInvalid={errors.wrongAnswer2 ? true : false}>
-				<FormLabel>誤答</FormLabel>
-				<Input
-					type="body"
-					placeholder="例:PHP"
-					{...register("wrongAnswer2", {
-						required: true,
+		<FormControl onSubmit={handleSubmit(setData)}
+			isInvalid={errors.answer ? true : false}>
+			<FormLabel>正答</FormLabel>
+			<Input
+				type="body"
+				placeholder="例:JavaScript"
+				{...register("answer", {
+					required: true,
 					pattern: {
 						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,200}$/,
 						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
 					}
-					})}
-				/>
-				{errors.wrongAnswer2 && errors.wrongAnswer2.message}
-			</FormControl>
+				})}
+			/>
+			{errors.answer && errors.answer.message}
+		</FormControl>
 
-			<FormControl onSubmit={handleSubmit(setData)}
-				isInvalid={errors.wrongAnswer3 ? true : false}>
-				<FormLabel>誤答</FormLabel>
-				<Input
-					type="body"
-					placeholder="例:Ruby"
-					{...register("wrongAnswer3", {
-						required: true,
+		<FormControl onSubmit={handleSubmit(setData)}
+			isInvalid={errors.wrongAnswer1 ? true : false}>
+			<FormLabel>誤答</FormLabel>
+			<Input
+				type="body"
+				placeholder="例:Go"
+				{...register("wrongAnswer1", {
+					required: true,
 					pattern: {
 						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,200}$/,
 						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
 					}
-					})}
-				/>
-				{errors.wrongAnswer3 && errors.wrongAnswer3.message}
-			</FormControl>
+				})}
+			/>
+			{errors.wrongAnswer1 && errors.wrongAnswer1.message}
+		</FormControl>
+
+		<FormControl onSubmit={handleSubmit(setData)}
+			isInvalid={errors.wrongAnswer2 ? true : false}>
+			<FormLabel>誤答</FormLabel>
+			<Input
+				type="body"
+				placeholder="例:PHP"
+				{...register("wrongAnswer2", {
+					required: true,
+					pattern: {
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,200}$/,
+						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+					}
+				})}
+			/>
+			{errors.wrongAnswer2 && errors.wrongAnswer2.message}
+		</FormControl>
+
+		<FormControl onSubmit={handleSubmit(setData)}
+			isInvalid={errors.wrongAnswer3 ? true : false}>
+			<FormLabel>誤答</FormLabel>
+			<Input
+				type="body"
+				placeholder="例:Ruby"
+				{...register("wrongAnswer3", {
+					required: true,
+					pattern: {
+						value: /^[^^＾"”`‘'’<>＜＞_＿%$#＆％＄|￥]{1,200}$/,
+						message: '特殊文字を使用しないでください' // JS only: <p>error message</p> TS only support string
+					}
+				})}
+			/>
+			{errors.wrongAnswer3 && errors.wrongAnswer3.message}
+		</FormControl>
 		<Stack>
 			<FormControl onSubmit={handleSubmit(setData)}
 				isInvalid={errors.explanation ? true : false}>
@@ -192,16 +193,16 @@ const Posts = () => {
 		<Stack>
 			<>問題文:{quizData.title}</>
 		</Stack>
-		<HStack>
-			<Button onClick={getAnswer} value={randomAnswer[0]}>回答1:{randomAnswer[0]}</Button>
-			<Button onClick={getAnswer} value={randomAnswer[1]}>回答2:{randomAnswer[1]}</Button>
-			<Button onClick={getAnswer} value={randomAnswer[2]}>回答3:{randomAnswer[2]}</Button>
-			<Button onClick={getAnswer} value={randomAnswer[3]}>回答4:{randomAnswer[3]}</Button>
-		</HStack>
+		<VStack>
+			<Container>回答1:{randomAnswer[0]}<Button margin="2" onClick={getAnswer} value={randomAnswer[0]}>これにする</Button></Container>
+			<Container>回答2:{randomAnswer[1]}<Button margin="2" onClick={getAnswer} value={randomAnswer[1]}>これにする</Button></Container>
+			<Container>回答3:{randomAnswer[2]}<Button margin="2" onClick={getAnswer} value={randomAnswer[2]}>これにする</Button></Container>
+			<Container>回答4:{randomAnswer[3]}<Button margin="2" onClick={getAnswer} value={randomAnswer[3]}>これにする</Button></Container>
+		</VStack>
 		<Stack>
-				<>{answer}</>
-				{answer && <>正解は{quizData.answer}です</>}
-			</Stack>
+			<>{answer}</>
+			{answer && <>正解は{quizData.answer}です</>}
+		</Stack>
 		<Stack>
 			{answer && <>解説文{quizData.explanation}</>}
 		</Stack>

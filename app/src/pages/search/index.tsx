@@ -68,7 +68,6 @@ const View = (): JSX.Element => {
       mode: "cors",
       method: "POST",
       headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
-      credentials: 'include',//bodyの代わりにcookieを送る
       body: JSON.stringify(URLQuery)
     }).then((res) => res.json())
       .then((datas) => {
@@ -111,7 +110,7 @@ const View = (): JSX.Element => {
               borderRadius="full"
               src={(window.URL.createObjectURL(postData.Icon))}
               alt="select picture" />
-            <Box bgColor="aquamarine"><Link href={`/${postData.Name}`}>{postData.Name}</Link>が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
+            <Box><Link href={`/${postData.Name}`}>{postData.Name}</Link>が{postData.CreatedAt.substring(0, 10)}に投稿しました</Box>
             <NextLink
               as={`/items/${postData.ID}`}
               href={{ pathname: `/items/[ID]`, query: userInfo }}
