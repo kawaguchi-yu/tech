@@ -1,10 +1,10 @@
 import React, { useState } from "react"
 import { useForm } from "react-hook-form";
-import Link from './components/Link';
 import {
 	chakra,
 	Flex,
 	Box,
+	Container,
 	Input,
 	Stack,
 	Button,
@@ -13,6 +13,7 @@ import {
 	useColorModeValue,
 } from '@chakra-ui/react';
 import router from "next/router";
+import Template from "./template";
 type LoginData = {
 	EMail: string
 	Password: string
@@ -55,19 +56,13 @@ const Login = (): JSX.Element => {
 				router.back()
 			}
 			})
-			.catch((err) => 
-				console.log(err)
-			)
+			.catch((err) => console.log(err))
 	};
 
 	return (
 		<>
 			<chakra.div>
-				<Flex bg={useColorModeValue('gray.100', 'gray.900')}>
-					<Link h={16} p={2} href="/">
-						<Heading>Techer</Heading>
-					</Link>
-				</Flex>
+				<Template />
 				<Flex justify={'center'}>
 					<Stack spacing={8} py={12}>
 						<Stack align={'center'}>
@@ -79,7 +74,7 @@ const Login = (): JSX.Element => {
 							p={8}>
 							<Stack spacing={4}>
 
-								<FormControl w={400} onSubmit={handleSubmit(setData)}
+								<FormControl w={[300,400]} onSubmit={handleSubmit(setData)}
 									isInvalid={errors.EMail ? true : false}>
 									<Input
 										type="email"
@@ -88,27 +83,27 @@ const Login = (): JSX.Element => {
 											required: "EMailを入力してください",
 											pattern: {
 												value: /^[a-zA-Z0-9_+-]+(.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/,
-												message: 'メールアドレスを入力してください' // JS only: <p>error message</p> TS only support string
+												message: 'メールアドレスを入力してください'
 											},
 										})}
 									/>
 									{errors.EMail && errors.EMail.message}
 								</FormControl>
 
-								<FormControl w={400} onSubmit={handleSubmit(setData)}
+								<FormControl w={[300,400]} onSubmit={handleSubmit(setData)}
 									isInvalid={errors.Password ? true : false}>
 									<Input
 										type="password"
-										placeholder="password1"
+										placeholder="Password1"
 										{...register("Password", {
 											required: "パスワードを入力してください",
 											minLength: {
 												value: 8,
-												message: '8文字以上にしてください' // JS only: <p>error message</p> TS only support string
+												message: '8文字以上にしてください' 
 											},
 											pattern: {
 												value: /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d)[a-zA-Z\d]{8,100}$/,
-												message: '小文字大文字数字をそれぞれ含めてください' // JS only: <p>error message</p> TS only support string
+												message: '小文字大文字数字をそれぞれ含めてください' 
 											}
 										})}
 									/>
@@ -122,7 +117,7 @@ const Login = (): JSX.Element => {
 										disabled={!formState.isValid}>
 										ログイン
 									</Button>
-									<Heading>{posts != "" && <>{JSON.stringify(posts)}</>}</Heading>
+									<Container textAlign="center">{posts != "" && <>{JSON.stringify(posts)}</>}</Container>
 								</Stack>
 							</Stack>
 						</Box>

@@ -15,7 +15,7 @@ const terms = () => {
     <Grid
     h="200px"
     templateRows="repeat(1, 1fr)"
-    templateColumns="repeat(2, 1fr)"
+    templateColumns="repeat(1, 1fr)"
     margin={5}
     gap={2}
 >

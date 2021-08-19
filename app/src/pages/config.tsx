@@ -143,14 +143,15 @@ const Config = () => {
 	}
 	return (<>
 		<Template />
-		{user.ID == guestuser && <Box bgColor="aquamarine">ゲストユーザーはアカウントを削除することができません。</Box>}
+		{user.ID == guestuser &&
+			<Box bgColor="aquamarine">ゲストユーザーはアカウントを削除することができません。
+			</Box>}
 		<Stack>
 			{view &&
 				<Image boxSize="300px" src={view} alt="select picture" />
 			}
-			<Stack>
-				<Input m="10" name="file" type='file' accept="image/*" onChange={onFileInputChange} />
-			</Stack>
+			<Input name="file" type='file' accept="image/*"size="sm"
+				onChange={onFileInputChange} />
 		</Stack>
 		<Stack>
 			<Button m="10" onClick={ApiFetch}　>アイコンを変更する</Button>

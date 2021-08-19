@@ -6,8 +6,11 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  Grid,
+  VStack,
+  Heading,
+  Container,
   GridItem,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import React, { useState, useEffect } from "react"
 import { useRouter } from 'next/router'
@@ -205,24 +208,18 @@ const Fuga = () => {
   }
   return (
     <>
-      <Box><Template /></Box>
+      <Template />
       <Stack align="center">
-        <Stack>
-          <Box>{userInPost.Posts[0].Title}</Box>
-        </Stack>
-        <Grid
-          h="200px"
-          templateRows="repeat(2, 1fr)"
-          templateColumns="repeat(5, 1fr)"
-          gap={4}
-        >
-           {choicesData && <>
-            <GridItem rowSpan={2} colSpan={5}><Button onClick={getAnswer} value={choicesData[0]}>回答1:{choicesData[0]}</Button></GridItem>
-            <GridItem rowSpan={2} colSpan={5}><Button onClick={getAnswer} value={choicesData[1]}>回答2:{choicesData[1]}</Button></GridItem>
-            <GridItem rowSpan={2} colSpan={5}><Button onClick={getAnswer} value={choicesData[2]}>回答3:{choicesData[2]}</Button></GridItem>
-            <GridItem rowSpan={2} colSpan={5}><Button onClick={getAnswer} value={choicesData[3]}>回答4:{choicesData[3]}</Button></GridItem>
-          </>}
-        </Grid>
+        <VStack
+          bg={useColorModeValue('white', 'gray.700')}
+          boxShadow={'lg'}
+          p={8}>
+          <Heading>{userInPost.Posts[0].Title}</Heading>
+          {choicesData&&<Container>回答1:{choicesData[0]}<Button margin="2" onClick={getAnswer} value={choicesData[0]}>これにする</Button></Container>}
+          {choicesData&&<Container>回答2:{choicesData[1]}<Button margin="2" onClick={getAnswer} value={choicesData[1]}>これにする</Button></Container>}
+          {choicesData&&<Container>回答3:{choicesData[2]}<Button margin="2" onClick={getAnswer} value={choicesData[2]}>これにする</Button></Container>}
+          {choicesData&&<Container>回答4:{choicesData[3]}<Button margin="2" onClick={getAnswer} value={choicesData[3]}>これにする</Button></Container>}
+        </VStack>
         <Stack>
           <>{answer}</>
           {answer == "不正解！" && <>正解は{userInPost.Posts[0].Answer}です</>}
@@ -254,10 +251,9 @@ const Fuga = () => {
           ? <Button disabled><StarIcon />いいね数{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGoodedCount : uiGoodedCount}</Button>
           : isGooded == true
             ? <Button onClick={() => { DeleteGoodFetch(), setIsGooded(false), setUiGoodedCount(uiGoodedCount - 1) }}><StarIcon color="gold" />いいねしました。{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGoodedCount : uiGoodedCount}</Button>
-            : <Button onClick={() => { GoodFetch(), setIsGooded(true), setUiGoodedCount(uiGoodedCount + 1) }} disabled={!user.ID} ><StarIcon />いいねする{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGoodedCount : uiGoodedCount}
-            {!user.ID && <>ログインしないといいねができません</>}</Button>
-
-        }
+            : <><Button onClick={() => { GoodFetch(), setIsGooded(true), setUiGoodedCount(uiGoodedCount + 1) }} disabled={!user.ID} ><StarIcon />いいねする{userInPost.Posts[0].Goods ? userInPost.Posts[0].Goods.length + uiGoodedCount : uiGoodedCount}</Button>
+              {!user.ID && <Box>ログインしないといいねができません</Box>}
+            </>}
       </Stack>
     </>)
 }
