@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import Template from "../template";
 import { useRouter } from 'next/router'
+import {sessionInformation} from '../../../env'
 type user = {
 	ID: number
 	CreatedAt: string
@@ -68,7 +69,7 @@ const Posts = () => {
 	useEffect(() => {
 		if (URLQuery) {
 			console.log("URLQuery", URLQuery)
-			fetch("http://localhost:8080/getuserbyid", {
+			fetch(`${sessionInformation.backendHost}/getuserbyid`, {
 				mode: "cors",
 				method: "POST",
 				headers: { "Content-Type": "application/json", },
@@ -87,7 +88,7 @@ const Posts = () => {
 
 	const upDateFetch = () => {
 		setData()
-		fetch("http://localhost:8080/updatepost", {
+		fetch(`${sessionInformation.backendHost}/updatepost`, {
 			mode: "cors",
 			method: "POST",
 			headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー

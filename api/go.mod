@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/aws/aws-sdk-go v1.40.34 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/joho/godotenv v1.3.0
 	github.com/labstack/echo/v4 v4.3.0

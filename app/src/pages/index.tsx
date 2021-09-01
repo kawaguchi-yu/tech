@@ -8,9 +8,10 @@ import {
 	GridItem,
 } from '@chakra-ui/react';
 import NextLink from "next/link";
-import Link from "./components/Link"
+import Link from "../../public"
 import React, { useState, useEffect } from "react"
 import Template from "./template";
+import {sessionInformation} from '../../env'
 type user = {
 	ID: string
 	CreatedAt: string
@@ -49,7 +50,7 @@ type good = {
 const Home = (): JSX.Element => {
 	const [postDatas, setPostDatas] = useState<post[]>([])
 	useEffect(() => {
-		fetch("http://localhost:8080/getalluserpost", {
+		fetch(`${sessionInformation.backendHost}/getalluserpost`, {
 			mode: "cors",
 			method: "GET",
 		}).then((res) => res.json())

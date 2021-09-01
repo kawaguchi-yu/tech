@@ -21,10 +21,11 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import { Search2Icon, HamburgerIcon } from '@chakra-ui/icons'
-import Link from "./components/Link"
+import Link from "../../public"
 import { useRouter } from 'next/router'
 import React, { useState, useEffect } from "react"
 import { useForm } from "react-hook-form";
+import { sessionInformation } from '../../env'
 type user = {
 	ID: string
 	CreatedAt: string
@@ -85,7 +86,7 @@ const Template = () => {
 	const router = useRouter()
 	const [user, setUser] = useState<user>();
 	useEffect(() => {
-		fetch("http://localhost:8080/user", {
+		fetch(`${sessionInformation.backendHost}/user`, {
 			mode: "cors",
 			method: "GET",
 			credentials: 'include',
@@ -110,7 +111,7 @@ const Template = () => {
 			})
 	}, [])
 	const GuestLogin = () => {
-		fetch("http://localhost:8080/guestlogin", {
+		fetch(`${sessionInformation.backendHost}/guestlogin`, {
 			mode: "cors",
 			method: "GET",
 			credentials: 'include',
@@ -120,7 +121,7 @@ const Template = () => {
 			})
 	}
 	const Logout = () => {
-		fetch("http://localhost:8080/logout", {
+		fetch(`${sessionInformation.backendHost}/logout`, {
 			mode: "cors",
 			method: "GET",
 			credentials: 'include',

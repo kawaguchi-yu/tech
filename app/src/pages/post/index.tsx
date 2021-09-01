@@ -10,6 +10,7 @@ import {
 	Button,
 } from '@chakra-ui/react';
 import Template from "../template";
+import {sessionInformation} from '../../../env'
 type quizType = {
 	title: string
 	answer: string
@@ -65,7 +66,7 @@ const Posts = () => {
 	}
 	const ApiFetch = () => {
 		setData()
-		fetch("http://localhost:8080/post", {
+		fetch(`${sessionInformation.backendHost}/post`, {
 			mode: "cors",
 			method: "POST",
 			headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー

@@ -8,10 +8,11 @@ import {
   GridItem,
 } from '@chakra-ui/react';
 import NextLink from "next/link";
-import Link from "../components/Link"
+import Link from "../../../public"
 import React, { useState, useEffect } from "react"
 import { useRouter } from 'next/router'
 import Template from "../template";
+import {sessionInformation} from '../../../env'
 type user = {
   ID: string
   CreatedAt: string
@@ -64,7 +65,7 @@ const View = (): JSX.Element => {
   useEffect(() => {
     if(URLQuery){
       console.log(URLQuery)
-    fetch("http://localhost:8080/returngoodedpostbyword", {
+    fetch(`${sessionInformation.backendHost}/returngoodedpostbyword`, {
       mode: "cors",
       method: "POST",
       headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー

@@ -15,6 +15,7 @@ import {
 import router from "next/router";
 import Template from "./template";
 import { useForm } from "react-hook-form";
+import {sessionInformation} from '../../env'
 type user = {
 	ID: number
 	Name: string
@@ -46,7 +47,7 @@ const userForm: user = {
 	Icon: "",
 	IconBlob: null,
 }
-const guestuser: number = 30;
+const guestuser: string = "Guest User";
 const Config = () => {
 	const { register, handleSubmit, formState, formState: { errors }, getValues } = useForm({
 		mode: "onTouched",
@@ -69,7 +70,7 @@ const Config = () => {
 	const [posts, setPosts] = useState<Blob>();
 	const [user, setUser] = useState<user>(userForm);
 	useEffect(() => {
-		fetch("http://localhost:8080/user", {
+		fetch(`${sessionInformation.backendHost}/user`, {
 			mode: "cors",
 			method: "GET",
 			credentials: 'include',
@@ -106,7 +107,7 @@ const Config = () => {
 			body: iconData,
 		}
 		delete options.headers["Content-Type"];
-		fetch("http://localhost:8080/seticon", options)
+		fetch(`${sessionInformation.backendHost}/seticon`, options)
 			.then((res) => res.blob())
 			.then((data) => {
 				setPosts(data);
@@ -117,7 +118,7 @@ const Config = () => {
 	};
 	const updateUser = () => {
 		setData()
-		fetch("http://localhost:8080/updateuser", {
+		fetch(`${sessionInformation.backendHost}/updateuser`, {
 			mode: "cors",
 			method: "POST",
 			headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
@@ -130,7 +131,7 @@ const Config = () => {
 			.catch((err) => { console.log(err) })
 	}
 	const DeleteFetch = () => {
-		fetch("http://localhost:8080/deleteuser", {
+		fetch(`${sessionInformation.backendHost}/deleteuser`, {
 			mode: "cors",
 			method: "GET",
 			credentials: "include",
@@ -143,7 +144,7 @@ const Config = () => {
 	}
 	return (<>
 		<Template />
-		{user.ID == guestuser &&
+		{user.Name == guestuser &&
 			<Box bgColor="aquamarine">ゲストユーザーはアカウントを削除することができません。
 			</Box>}
 		<Stack>
@@ -209,7 +210,7 @@ const Config = () => {
 		<Spacer />
 		<Stack m="10">
 			<Button onClick={updateUser} >アカウント情報を更新する</Button>
-			<Button onClick={DeleteFetch} disabled={user.ID == guestuser}>ユーザーを削除する</Button>
+			<Button onClick={DeleteFetch} disabled={user.Name == guestuser}>ユーザーを削除する</Button>
 		</Stack>
 	</>)
 }

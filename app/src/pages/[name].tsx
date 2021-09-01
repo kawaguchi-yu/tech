@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import Link from "next/link";
 import Template from "./template";
+import {sessionInformation} from '../../env'
 type user = {
 	ID: number
 	CreatedAt: string
@@ -71,7 +72,7 @@ const MyPages = (): JSX.Element => {
 	}, [router])
 	useEffect(() => {
 		if (URLQuery) {
-			fetch("http://localhost:8080/getuserpost", {
+			fetch(`${sessionInformation.backendHost}/getuserpost`, {
 				mode: "cors",
 				method: "POST",
 				headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
@@ -79,6 +80,7 @@ const MyPages = (): JSX.Element => {
 				body: JSON.stringify(URLQuery)
 			}).then((res) => res.json())
 				.then((datas) => {
+					console.log(datas)
 					const userData: user = datas
 					let bin = atob(userData.Icon.replace(/^.*,/, ''));
 					let buffer = new Uint8Array(bin.length);
@@ -97,14 +99,14 @@ const MyPages = (): JSX.Element => {
 					setPostDatas(userData.Posts)
 					setUserId({ ID: 0, PostID: 0, UserId: userData.ID })
 				})
-				.catch(() => {
-					console.error("データを貰ってくることができませんでした")
-				})
+				// .catch((err) => {
+				// 	console.error("データを貰ってくることができませんでした"+err)
+				// })
 		}
 	}, [URLQuery])
 	useEffect(() => {
 		if (userId) {
-			fetch("http://localhost:8080/returngoodedpost", {
+			fetch(`${sessionInformation.backendHost}/returngoodedpost`, {
 				mode: "cors",
 				method: "POST",
 				headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
@@ -135,8 +137,8 @@ const MyPages = (): JSX.Element => {
 					})
 					setGoodedPostDatas(returnPostDatas)
 				})
-				.catch(() => {
-					console.error("データを貰ってくることができませんでした")
+				.catch((err) => {
+					console.error("データを貰ってくることができませんでしたerr="+err)
 				})
 		}
 	}, [userId])

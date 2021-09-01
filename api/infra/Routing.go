@@ -3,6 +3,7 @@ package infra
 import (
 	"fmt"
 	"hello/server/interfaces/controllers"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
@@ -80,5 +81,8 @@ func Routing(e *echo.Echo) {
 	e.GET("/deleteuser", func(c echo.Context) error {
 		fmt.Printf("/deleteuser\n")
 		return userController.DeleteUser(c)
+	})
+	e.GET("/healthcheck", func(c echo.Context) error {
+		return c.NoContent(http.StatusOK)
 	})
 }

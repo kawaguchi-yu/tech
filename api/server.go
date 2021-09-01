@@ -13,7 +13,7 @@ import (
 func main() {
 	e := echo.New() //eにecho.New(echoを使っている)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost"},
+		AllowOrigins: []string{"http://localhost", "http://quiztecher.com"},
 		AllowMethods: []string{
 			http.MethodGet, http.MethodHead,
 			http.MethodPut, http.MethodOptions,
