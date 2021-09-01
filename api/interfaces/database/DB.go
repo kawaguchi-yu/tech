@@ -88,7 +88,6 @@ func (db *UserRepository) ReturnUserPostByName(name string) (u domain.User, err 
 	}
 	if err := db.First(&user.Profile, "user_id", user.ID).Error; err != nil {
 		fmt.Printf("profileの取得に失敗しました\n")
-		return user, err
 	}
 	for _, post := range posts {
 		for _, good := range goods {

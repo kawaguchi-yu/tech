@@ -5,13 +5,16 @@ import (
 	"hello/server/domain"
 	"hello/server/interfaces/database"
 	"hello/server/useCase"
-	"io"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -110,27 +113,53 @@ func (controller *UserController) SetIcon(c Context) (err error) {
 		return c.JSON(http.StatusBadRequest, "ファイルをioに変換できませんでした")
 	}
 	defer src.Close()
-	os.Chdir("img")
-	iconModel := strings.Split(icon.Filename, ".")
-	iconName := iconModel[0]
-	extension := iconModel[1]
-	dst, err := os.Create(fmt.Sprintf("%s_out.%s", iconName, extension))
-	if err != nil { //"%s_out.%s"ここに\nを付け足すな！！！！！
-		fmt.Printf("ファイルが作れませんでした\n")
-		return c.JSON(http.StatusBadRequest, "ファイルが作れませんでした")
+
+	if err := godotenv.Load(".env"); err != nil {
+		fmt.Printf(".envファイルの読み込みが失敗しました\n")
 	}
-	defer dst.Close()
-	if _, err = io.Copy(dst, src); err != nil { //ファイルの内容をコピー
-		fmt.Printf("コピーできませんでした\n")
-		return c.JSON(http.StatusBadRequest, "コピーできませんでした")
+	awsAccesskey := os.Getenv("AWSACCESSKEY")
+	awsSecretkey := os.Getenv("AWSSECRETKEY")
+	fmt.Printf("key%v%v\n", awsAccesskey, awsSecretkey)
+	sess := session.Must(session.NewSession(&aws.Config{
+		Credentials: credentials.NewStaticCredentials(awsAccesskey, awsSecretkey, ""),
+		Region:      aws.String("ap-northeast-1"),
+	}))
+	fmt.Printf("filename=%v\n", icon.Filename)
+	uploader := s3manager.NewUploader(sess)
+	// file, err := os.Open(icon.Filename)
+	if err != nil {
+		fmt.Printf("fileをopenできませんでした\n")
+		return c.JSON(http.StatusBadRequest, "fileをopenできませんでした")
 	}
-	err = controller.Interactor.SetIcon(email, dst.Name())
+	res, err := uploader.Upload(&s3manager.UploadInput{
+		Bucket: aws.String("techer-s3-001"),
+		Key:    aws.String(icon.Filename),
+		Body:   src,
+	})
+	if err != nil {
+		fmt.Printf("uploadできませんでした errormessage=%v\n", res)
+		return c.JSON(http.StatusBadRequest, "uploadできませんでした")
+	}
+	// iconModel := strings.Split(icon.Filename, ".")
+	// iconName := iconModel[0]
+	// extension := iconModel[1]
+	// dst, err := os.Create(fmt.Sprintf("%s_out.%s", iconName, extension))
+	// if err != nil { //"%s_out.%s"ここに\nを付け足すな！！！！！
+	// 	fmt.Printf("ファイルが作れませんでした\n")
+	// 	return c.JSON(http.StatusBadRequest, "ファイルが作れませんでした")
+	// }
+	// defer dst.Close()
+	// if _, err = io.Copy(dst, src); err != nil { //ファイルの内容をコピー
+	// 	fmt.Printf("コピーできませんでした\n")
+	// 	return c.JSON(http.StatusBadRequest, "コピーできませんでした")
+	// }
+	err = controller.Interactor.SetIcon(email, icon.Filename)
 	if err != nil {
 		fmt.Printf("iconをuserにセットできませんでした\n")
 		return c.JSON(http.StatusBadRequest, "iconをuserにセットできませんでした")
 	}
 	fmt.Printf("seticonは正常に終了しました\n")
-	return c.File(dst.Name())
+	return c.File("fallheal_out.png")
 }
 func (controller *UserController) CreatePost(c Context) (err error) {
 	post := domain.Post{}
@@ -199,7 +228,7 @@ func (controller *UserController) DeleteUser(c Context) (err error) {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "emailからuserを取得できませんでした")
 	}
-	if err := GuestUserCheck(user.ID); err != nil {
+	if err := GuestUserCheck(user.Name); err != nil {
 		return c.JSON(http.StatusBadRequest, "GuestUserは削除権限がありません")
 	}
 	err = controller.Interactor.DeleteAllByUserEMail(email)

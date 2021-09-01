@@ -1,7 +1,7 @@
 import { useState } from "react";
 import * as React from "react";
 import { useForm } from "react-hook-form";
-import Link from './components/Link';
+import Link from '../../public';
 import {
   chakra,
   Input,
@@ -18,7 +18,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react"
 import Template from "./template";
-
+import {sessionInformation} from '../../env'
 type FormData = {
   Name: string;
   EMail: string;
@@ -39,7 +39,7 @@ const View = () => {
   const { register, handleSubmit, formState, formState: { errors }, getValues } = useForm<FormType>({
     mode: "onTouched"
   });
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<string>();
   const setData = () => {
     const hasData = getValues(["Name", "EMail", "Password"]);
     userData.Name = hasData[0]
@@ -49,14 +49,14 @@ const View = () => {
   };
   const ApiFetch = () => {
     setData()
-    fetch("http://localhost:8080/signup", {
+    fetch(`${sessionInformation.backendHost}/signup`, {
       mode: "cors",
       method: "POST",
       credentials: 'include',
       headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
       body: JSON.stringify(userData),
     })
-      .then((res) => res.json())
+      .then((res) => res.text())
       .then((data) => {
         setPosts(data);
       })
@@ -153,7 +153,7 @@ const View = () => {
                 onClick={ApiFetch}
                 disabled={!formState.isValid}
               >登録する</Button>
-              {JSON.stringify(posts)}
+              {posts && posts}
             </Box>
           </Stack>
         </Flex>

@@ -15,9 +15,10 @@ import {
 import React, { useState, useEffect } from "react"
 import { useRouter } from 'next/router'
 import NextLink from "next/link";
-import Link from "../components/Link"
+import Link from "../../../public"
 import { StarIcon } from '@chakra-ui/icons'
 import Template from '../template';
+import {sessionInformation} from '../../../env'
 type user = {
   ID: number
   CreatedAt: string
@@ -97,7 +98,7 @@ const Fuga = () => {
     }
   }, [router])
   useEffect(() => {
-    fetch("http://localhost:8080/user", {
+    fetch(`${sessionInformation.backendHost}/user`, {
       mode: "cors",
       method: "GET",
       credentials: 'include',
@@ -110,7 +111,7 @@ const Fuga = () => {
   }, [])
   useEffect(() => {
     if (URLQuery) {
-      fetch("http://localhost:8080/getuserbyid", {
+      fetch(`${sessionInformation.backendHost}/getuserbyid`, {
         mode: "cors",
         method: "POST",
         headers: { "Content-Type": "application/json", },
@@ -127,7 +128,7 @@ const Fuga = () => {
   }, [URLQuery])
   const DeletePostFetch = () => {
     const ArticleData = { ID: Number(router.query.ID), UserID: Number(user.ID) }
-    fetch("http://localhost:8080/deletepost", {
+    fetch(`${sessionInformation.backendHost}/deletepost`, {
       mode: "cors",
       method: "POST",
       headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
@@ -142,7 +143,7 @@ const Fuga = () => {
   };
   const DeleteGoodFetch = () => {
     const GoodData = { userID: Number(user.ID), postID: Number(router.query.ID) }
-    fetch("http://localhost:8080/deletegood", {
+    fetch(`${sessionInformation.backendHost}/deletegood`, {
       mode: "cors",
       method: "POST",
       headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー
@@ -159,7 +160,7 @@ const Fuga = () => {
 
     const GoodData = { userID: Number(user.ID), postID: Number(router.query.ID) }
     console.log("GoodData", GoodData)
-    fetch("http://localhost:8080/good", {
+    fetch(`${sessionInformation.backendHost}/good`, {
       mode: "cors",
       method: "POST",
       headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー

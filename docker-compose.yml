@@ -1,15 +1,15 @@
 version: "3.8"
-services: 
+services:
     db:
         image: mysql
-        environment: 
+        environment:
             MYSQL_ROOT_PASSWORD : "hoge"
             MYSQL_DATABASE: "db"
-        ports: 
+        ports:
             - "3306:3306"
         command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --skip-character-set-client-handshake
     api:
-        build: 
+        build:
             context: ./api
         depends_on:
             - app
@@ -18,11 +18,11 @@ services:
         volumes:
             - ./api:/usr/api
     app:
-        build: 
+        build:
             context: ./app
         depends_on:
             - db
-        ports: 
+        ports:
             - "80:80"
         volumes:
             - ./app:/usr/app

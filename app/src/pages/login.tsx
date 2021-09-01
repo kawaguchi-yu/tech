@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import router from "next/router";
 import Template from "./template";
+import {sessionInformation} from '../../env'
 type LoginData = {
 	EMail: string
 	Password: string
@@ -37,7 +38,7 @@ const Login = (): JSX.Element => {
 
 	const ApiFetch = () => {
 		setData()
-		fetch("http://localhost:8080/login", {
+		fetch(`${sessionInformation.backendHost}/login`, {
 			mode: "cors",
 			method: "POST",
 			headers: { "Content-Type": "application/json", }, // JSON形式のデータのヘッダー

@@ -64,10 +64,10 @@ func getEnv() env {
 		fmt.Printf(".envファイルの読み込みが失敗しました\n")
 	}
 	e := env{
-		userName: os.Getenv("USERNAME"),
-		password: os.Getenv("PASSWORD"),
-		host:     os.Getenv("HOST"),
-		dbName:   os.Getenv("DBNAME"),
+		userName: os.Getenv("LOCALUSERNAME"),
+		password: os.Getenv("LOCALPASSWORD"),
+		host:     os.Getenv("LOCALHOST"),
+		dbName:   os.Getenv("LOCALDBNAME"),
 	}
 	return e
 }
