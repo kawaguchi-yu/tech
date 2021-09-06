@@ -150,7 +150,7 @@ func (controller *UserController) SetIcon(c Context) (err error) {
 		return c.JSON(http.StatusBadRequest, "iconをuserにセットできませんでした")
 	}
 	fmt.Printf("seticonは正常に終了しました\n")
-	return c.File("fallheal_out.png")
+	return c.JSON(http.StatusOK, "icon変更完了")
 }
 func (controller *UserController) CreatePost(c Context) (err error) {
 	post := domain.Post{}

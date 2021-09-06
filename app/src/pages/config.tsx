@@ -108,10 +108,11 @@ const Config = () => {
 		}
 		delete options.headers["Content-Type"];
 		fetch(`${sessionInformation.backendHost}/seticon`, options)
-			.then((res) => res.blob())
+			.then((res) => res.json())
 			.then((data) => {
-				setPosts(data);
-				console.log("返ってきたデータ", data)
+				if (data == "icon変更完了"){
+					router.back()
+				}
 			})
 			.catch((err) => { console.log(err) })
 		console.log("アイコンデータ", iconData)
@@ -156,9 +157,7 @@ const Config = () => {
 		</Stack>
 		<Stack>
 			<Button m="10" onClick={ApiFetch}　>アイコンを変更する</Button>
-			{posts &&
-				<Image boxSize="300px" src={(window.URL.createObjectURL(posts))} alt="select picture" />
-			}
+			{posts &&	posts}
 		</Stack>
 		{user && <Stack>
 			<FormControl onSubmit={handleSubmit(setData)}>
