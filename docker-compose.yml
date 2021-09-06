@@ -3,8 +3,8 @@ services:
     db:
         image: mysql
         environment:
-            MYSQL_ROOT_PASSWORD : "hoge"
-            MYSQL_DATABASE: "db"
+            MYSQL_ROOT_PASSWORD : ${MYSQLROOTPASSWORD}
+            MYSQL_DATABASE: ${MYSQLDATABASE}
         ports:
             - "3306:3306"
         command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --skip-character-set-client-handshake
