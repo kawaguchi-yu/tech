@@ -41,7 +41,7 @@ func (controller *UserController) CreateUser(c Context) (err error) {
 	}
 	user.Password = string(hashedPassword)
 	fmt.Printf("%+v\n", user)
-	user.Icon = ("dog_out.png")
+	user.Icon = ("dog.png")
 	err = controller.Interactor.CreateUser(user)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "ユーザー登録できませんでした")
@@ -66,7 +66,7 @@ func (controller *UserController) CreateUser(c Context) (err error) {
 	cookie.Path = "/"
 	cookie.HttpOnly = true
 	c.SetCookie(cookie)
-	c.JSON(http.StatusOK, "Add成功！")
+	c.JSON(http.StatusOK, "ユーザー登録完了")
 	return
 }
 func (controller *UserController) CreateGood(c Context) (err error) {
