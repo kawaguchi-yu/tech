@@ -51,7 +51,11 @@ func (controller *UserController) CreateUser(c Context) (err error) {
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // 有効期限
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte("kirikiri")) //電子署名
+	encryptionKey, err := GetJWTToken()
+	if err != nil {
+		return err
+	}
+	tokenString, err := token.SignedString([]byte(encryptionKey)) //電子署名
 	if err != nil {
 		panic("電子署名できませんでした")
 	}
@@ -140,19 +144,6 @@ func (controller *UserController) SetIcon(c Context) (err error) {
 		fmt.Printf("uploadできませんでした errormessage=%v\n", res)
 		return c.JSON(http.StatusBadRequest, "uploadできませんでした")
 	}
-	// iconModel := strings.Split(icon.Filename, ".")
-	// iconName := iconModel[0]
-	// extension := iconModel[1]
-	// dst, err := os.Create(fmt.Sprintf("%s_out.%s", iconName, extension))
-	// if err != nil { //"%s_out.%s"ここに\nを付け足すな！！！！！
-	// 	fmt.Printf("ファイルが作れませんでした\n")
-	// 	return c.JSON(http.StatusBadRequest, "ファイルが作れませんでした")
-	// }
-	// defer dst.Close()
-	// if _, err = io.Copy(dst, src); err != nil { //ファイルの内容をコピー
-	// 	fmt.Printf("コピーできませんでした\n")
-	// 	return c.JSON(http.StatusBadRequest, "コピーできませんでした")
-	// }
 	err = controller.Interactor.SetIcon(email, icon.Filename)
 	if err != nil {
 		fmt.Printf("iconをuserにセットできませんでした\n")
@@ -214,8 +205,12 @@ func (controller *UserController) DeleteUser(c Context) (err error) {
 		fmt.Printf("クッキーを読み取れませんでした%v\n", cookie)
 		return c.JSON(500, "クッキーを読み取れませんでした")
 	}
+	encryptionKey, err := GetJWTToken()
+	if err != nil {
+		return err
+	}
 	token, err := jwt.ParseWithClaims(cookie.Value, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte("kirikiri"), nil
+		return []byte(encryptionKey), nil
 	})
 	if err != nil || !token.Valid {
 		fmt.Printf("パルスに失敗しました\n")
@@ -260,7 +255,11 @@ func (controller *UserController) GuestLogin(c Context) (err error) {
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // 有効期限
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte("kirikiri")) //電子署名
+	encryptionKey, err := GetJWTToken()
+	if err != nil {
+		return err
+	}
+	tokenString, err := token.SignedString([]byte(encryptionKey)) //電子署名
 	if err != nil {
 		panic("電子署名できませんでした")
 	}
@@ -289,7 +288,11 @@ func (controller *UserController) Login(c Context) (err error) {
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // 有効期限
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte("kirikiri")) //電子署名
+	encryptionKey, err := GetJWTToken()
+	if err != nil {
+		return err
+	}
+	tokenString, err := token.SignedString([]byte(encryptionKey)) //電子署名
 	if err != nil {
 		panic("電子署名できませんでした")
 	}

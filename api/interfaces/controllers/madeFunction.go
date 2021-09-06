@@ -24,14 +24,26 @@ func GuestUserCheck(userName string) error {
 	}
 	return nil
 }
+func GetJWTToken() (string, error) {
+	if err := godotenv.Load(".env"); err != nil {
+		fmt.Printf(".envファイルの読み込みが失敗しました\n")
+		return "error", err
+	}
+	encryptionKey := os.Getenv("ENCRYPTIONKEY")
+	return encryptionKey, nil
+}
 func ReadCookieReturnEMail(c Context) (string, error) {
 	cookie, err := c.Cookie("jwt")
 	if err != nil {
 		fmt.Printf("クッキーを読み込めませんでした%v\n", cookie)
 		return "error", err
 	}
+	encryptionKey, err := GetJWTToken()
+	if err != nil {
+		return "error", err
+	}
 	token, err := jwt.ParseWithClaims(cookie.Value, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte("kirikiri"), nil
+		return []byte(encryptionKey), nil
 	})
 	if err != nil || !token.Valid {
 		fmt.Printf("パルスに失敗しました\n")
