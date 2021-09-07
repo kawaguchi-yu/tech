@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import {
 	Box,
 	Button,
+	useToast,
 	Input,
 	Image,
 	Stack,
@@ -15,7 +16,7 @@ import {
 import router from "next/router";
 import Template from "./template";
 import { useForm } from "react-hook-form";
-import {sessionInformation} from '../../env'
+import { sessionInformation } from '../../env'
 type user = {
 	ID: number
 	Name: string
@@ -67,8 +68,8 @@ const Config = () => {
 	}
 	const [view, setview] = useState<string>();
 	const [iconData, setIconData] = useState<FormData>();
-	const [posts, setPosts] = useState<Blob>();
 	const [user, setUser] = useState<user>(userForm);
+	const toast = useToast();
 	useEffect(() => {
 		fetch(`${sessionInformation.backendHost}/user`, {
 			mode: "cors",
@@ -108,10 +109,25 @@ const Config = () => {
 		}
 		delete options.headers["Content-Type"];
 		fetch(`${sessionInformation.backendHost}/seticon`, options)
-			.then((res) => res.blob())
+			.then((res) => res.json())
 			.then((data) => {
-				setPosts(data);
-				console.log("返ってきたデータ", data)
+				if (data == "icon変更完了") {
+					toast({
+						title: "iconを変更しました！",
+						description: "正常にiconが変更されました。",
+						status: "success",
+						duration: 4000,
+						isClosable: true,
+					})
+				} else {
+					toast({
+						title: "エラーが発生しました",
+						description: data,
+						status: "error",
+						duration: 4000,
+						isClosable: true,
+					})
+				}
 			})
 			.catch((err) => { console.log(err) })
 		console.log("アイコンデータ", iconData)
@@ -151,14 +167,11 @@ const Config = () => {
 			{view &&
 				<Image boxSize="300px" src={view} alt="select picture" />
 			}
-			<Input name="file" type='file' accept="image/*"size="sm"
+			<Input name="file" type='file' accept="image/*" size="sm"
 				onChange={onFileInputChange} />
 		</Stack>
 		<Stack>
 			<Button m="10" onClick={ApiFetch}　>アイコンを変更する</Button>
-			{posts &&
-				<Image boxSize="300px" src={(window.URL.createObjectURL(posts))} alt="select picture" />
-			}
 		</Stack>
 		{user && <Stack>
 			<FormControl onSubmit={handleSubmit(setData)}>
