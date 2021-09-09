@@ -4,7 +4,7 @@
 技術系記事を閲覧するだけでなく、一問一答形式のクイズを解くことで、
 さらに記憶が定着するのではと思い作成しました。
 
-http://quiztecher.com/
+https://quiztecher.com/
 
 ## 使用技術
 Next.js 11.0.1
