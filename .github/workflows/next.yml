@@ -13,5 +13,7 @@ jobs:
         node-version: '11.12.x'
     - name: yarn install
       run: yarn install
+      working-directory: ./app
     - name: Run jest test
       run: npm test
+      working-directory: ./app
