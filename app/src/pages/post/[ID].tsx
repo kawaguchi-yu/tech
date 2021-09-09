@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import Template from "../template";
 import { useRouter } from 'next/router'
+import randomSwap from "../../../tests/randomswap";
 import {sessionInformation} from '../../../env'
 type user = {
 	ID: number
@@ -139,13 +140,7 @@ const Posts = () => {
 		console.log(quizData)
 	}
 	const RandomAnswer = () => {
-		let answer = [quizData.Answer, quizData.WrongAnswer1, quizData.WrongAnswer2, quizData.WrongAnswer3]
-		for (let i = answer.length - 1; i > 0; i--) {
-			let j = Math.floor(Math.random() * (i + 1));
-			let tmp = answer[i];
-			answer[i] = answer[j];
-			answer[j] = tmp;
-		}
+		let answer:string[] = randomSwap(quizData.Answer, quizData.WrongAnswer1, quizData.WrongAnswer2, quizData.WrongAnswer3)
 		setRandomAnswer(answer)
 	}
 	const test = () => {
