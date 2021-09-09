@@ -12,7 +12,7 @@ jobs:
       with:
         node-version: '11.12.x'
     - name: yarn install
-      run: yarn install
+      run: yarn install --ignore-engines
       working-directory: ./app
     - name: Run jest test
       run: npm test
