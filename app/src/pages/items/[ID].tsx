@@ -18,7 +18,7 @@ import NextLink from "next/link";
 import Link from "../../../public"
 import { StarIcon } from '@chakra-ui/icons'
 import Template from '../template';
-import {sessionInformation} from '../../../env'
+import { sessionInformation } from '../../../env'
 type user = {
   ID: number
   CreatedAt: string
@@ -216,10 +216,10 @@ const Fuga = () => {
           boxShadow={'lg'}
           p={8}>
           <Heading>{userInPost.Posts[0].Title}</Heading>
-          {choicesData&&<Container>回答1:{choicesData[0]}<Button margin="2" onClick={getAnswer} value={choicesData[0]}>これにする</Button></Container>}
-          {choicesData&&<Container>回答2:{choicesData[1]}<Button margin="2" onClick={getAnswer} value={choicesData[1]}>これにする</Button></Container>}
-          {choicesData&&<Container>回答3:{choicesData[2]}<Button margin="2" onClick={getAnswer} value={choicesData[2]}>これにする</Button></Container>}
-          {choicesData&&<Container>回答4:{choicesData[3]}<Button margin="2" onClick={getAnswer} value={choicesData[3]}>これにする</Button></Container>}
+          {choicesData && <><Container>回答1:{choicesData[0]}</Container><Button margin="2" onClick={getAnswer} value={choicesData[0]}>これにする</Button></>}
+          {choicesData && <><Container>回答1:{choicesData[1]}</Container><Button margin="2" onClick={getAnswer} value={choicesData[1]}>これにする</Button></>}
+          {choicesData && <><Container>回答1:{choicesData[2]}</Container><Button margin="2" onClick={getAnswer} value={choicesData[2]}>これにする</Button></>}
+          {choicesData && <><Container>回答1:{choicesData[3]}</Container><Button margin="2" onClick={getAnswer} value={choicesData[3]}>これにする</Button></>}
         </VStack>
         <Stack>
           <>{answer}</>

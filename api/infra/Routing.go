@@ -10,30 +10,6 @@ import (
 
 func Routing(e *echo.Echo) {
 	userController := controllers.NewUserController(DBInit())
-	e.POST("/updateuser", func(c echo.Context) error {
-		fmt.Printf("/updateuser\n")
-		return userController.UpdateUser(c)
-	})
-	e.POST("/seticon", func(c echo.Context) error {
-		fmt.Printf("/seticon\n")
-		return userController.SetIcon(c)
-	})
-	e.POST("/updatepost", func(c echo.Context) error { //試してない
-		fmt.Printf("/updatepost\n")
-		return userController.UpdatePost(c)
-	})
-	e.POST("/deletepost", func(c echo.Context) error {
-		fmt.Printf("/deletepost\n")
-		return userController.DeletePost(c)
-	})
-	e.POST("/post", func(c echo.Context) error {
-		fmt.Printf("post処理が呼ばれました\n")
-		return userController.CreatePost(c)
-	})
-	e.POST("/getuserpost", func(c echo.Context) error {
-		fmt.Printf("/getuserpost\n")
-		return userController.ReturnUserPostByName(c)
-	})
 	e.GET("/getalluserpost", func(c echo.Context) error {
 		fmt.Printf("/getalluserpost\n")
 		return userController.ReturnAllUserPost(c)
@@ -45,6 +21,49 @@ func Routing(e *echo.Echo) {
 	e.GET("/user", func(c echo.Context) error {
 		fmt.Printf("/user\n")
 		return userController.ReadCookieReturnUser(c)
+	})
+	e.GET("/guestlogin", func(c echo.Context) error {
+		fmt.Printf("/guestlogin\n")
+		return userController.GuestLogin(c)
+	})
+	e.GET("/deleteuser", func(c echo.Context) error {
+		fmt.Printf("/deleteuser\n")
+		return userController.DeleteUser(c)
+	})
+	e.GET("/healthcheck", func(c echo.Context) error {
+		return c.NoContent(http.StatusOK)
+	})
+	e.POST("/signup", func(c echo.Context) error {
+		fmt.Printf("/signup\n")
+		return userController.CreateUser(c)
+	})
+	e.POST("/login", func(c echo.Context) error {
+		fmt.Printf("/login\n")
+		return userController.Login(c)
+	})
+	e.POST("/updateuser", func(c echo.Context) error {
+		fmt.Printf("/updateuser\n")
+		return userController.UpdateUser(c)
+	})
+	e.POST("/seticon", func(c echo.Context) error {
+		fmt.Printf("/seticon\n")
+		return userController.SetIcon(c)
+	})
+	e.POST("/post", func(c echo.Context) error {
+		fmt.Printf("post処理が呼ばれました\n")
+		return userController.CreatePost(c)
+	})
+	e.POST("/updatepost", func(c echo.Context) error { //試してない
+		fmt.Printf("/updatepost\n")
+		return userController.UpdatePost(c)
+	})
+	e.POST("/deletepost", func(c echo.Context) error {
+		fmt.Printf("/deletepost\n")
+		return userController.DeletePost(c)
+	})
+	e.POST("/getuserpost", func(c echo.Context) error {
+		fmt.Printf("/getuserpost\n")
+		return userController.ReturnUserPostByName(c)
 	})
 	e.POST("/getuserbyid", func(c echo.Context) error {
 		fmt.Printf("/getuserbyid\n")
@@ -58,14 +77,6 @@ func Routing(e *echo.Echo) {
 		fmt.Printf("/returngoodedpostbyword\n")
 		return userController.ReturnGoodedPostByWord(c)
 	})
-	e.GET("/guestlogin", func(c echo.Context) error {
-		fmt.Printf("/guestlogin\n")
-		return userController.GuestLogin(c)
-	})
-	e.POST("/login", func(c echo.Context) error {
-		fmt.Printf("/login\n")
-		return userController.Login(c)
-	})
 	e.POST("/good", func(c echo.Context) error {
 		fmt.Printf("/good\n")
 		return userController.CreateGood(c)
@@ -74,15 +85,5 @@ func Routing(e *echo.Echo) {
 		fmt.Printf("/deletegood\n")
 		return userController.DeleteGoodByPostID(c)
 	})
-	e.POST("/signup", func(c echo.Context) error {
-		fmt.Printf("/signup\n")
-		return userController.CreateUser(c)
-	}) //user.structのデータを貰って登録する
-	e.GET("/deleteuser", func(c echo.Context) error {
-		fmt.Printf("/deleteuser\n")
-		return userController.DeleteUser(c)
-	})
-	e.GET("/healthcheck", func(c echo.Context) error {
-		return c.NoContent(http.StatusOK)
-	})
+
 }

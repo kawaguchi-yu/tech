@@ -9,7 +9,11 @@ import (
 )
 
 // 出力の定義
-
+// @title Techer API
+// @version 1.0
+// @description This is a Api server
+// @license.name Apache 2.0
+// @BasePath /
 func main() {
 	e := echo.New() //eにecho.New(echoを使っている)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
